@@ -897,39 +897,161 @@ button {
 .sim-status-group {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
+
+.sim-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 .sim-title {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #FFFFFF;
+  letter-spacing: 0.04em;
+}
+
+.sim-interactive-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: #FCD34D;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 0.18rem 0.55rem;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+}
+
+.pulse-beacon {
+  width: 6px;
+  height: 6px;
+  background: #F59E0B;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #F59E0B;
+  animation: beaconPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes beaconPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.6); opacity: 0.4; }
 }
 
 .sim-mode-toggle {
   display: flex;
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-sm);
-  padding: 3px;
-  gap: 3px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 4px;
+  gap: 4px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
 }
+
 .mode-btn {
-  padding: 0.4rem 0.9rem;
-  border-radius: 6px;
-  font-size: 0.775rem;
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 1rem;
+  border-radius: 7px;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.75);
-  transition: all 0.2s;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
 }
+
+.mode-btn:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+.mode-btn:active {
+  transform: scale(0.96);
+}
+
+/* Shimmer reflection sweeping across buttons */
+.mode-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+  transform: skewX(-20deg);
+  transition: none;
+}
+
+.mode-btn.lure-pulse::after,
+.mode-btn.active-optimal::after {
+  animation: sheenSweep 3.5s infinite ease-in-out;
+}
+
+@keyframes sheenSweep {
+  0% { left: -120%; }
+  35%, 100% { left: 140%; }
+}
+
+/* Active Baseline State */
 .mode-btn.active {
-  background: var(--copper-600);
+  background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
   color: #FFFFFF;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
+
+/* Active Ag-X State */
 .mode-btn.active-optimal {
-  background: var(--emerald-600);
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
   color: #FFFFFF;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  border-color: rgba(52, 211, 153, 0.6);
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Luring Breathing Glow Pulse for Inactive Ag-X button */
+@keyframes lureBreathingPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6), inset 0 0 8px rgba(16, 185, 129, 0.2);
+    border-color: rgba(52, 211, 153, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 16px 3px rgba(16, 185, 129, 0.75), inset 0 0 12px rgba(16, 185, 129, 0.4);
+    border-color: rgba(52, 211, 153, 0.95);
+    transform: scale(1.03);
+    color: #FFFFFF;
+  }
+}
+
+.mode-btn.lure-pulse {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1.5px solid rgba(52, 211, 153, 0.5);
+  color: #A7F3D0;
+  animation: lureBreathingPulse 2.2s infinite ease-in-out;
+}
+
+.lure-badge {
+  font-size: 0.58rem;
+  font-weight: 900;
+  padding: 0.15rem 0.45rem;
+  background: linear-gradient(135deg, #F59E0B, #10B981);
+  color: #0F172A;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  margin-left: 0.2rem;
 }
 
 .sim-telemetry-strip {

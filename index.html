@@ -257,10 +257,23 @@
         <!-- Simulator Command Bar -->
         <div class="sim-controls-bar">
           <div class="sim-status-group">
-            <span class="sim-title">FURNACE CONTROLLER:</span>
+            <div class="sim-title-wrap">
+              <span class="sim-title">FURNACE CONTROLLER:</span>
+              <span class="sim-interactive-badge">
+                <span class="pulse-beacon"></span>
+                CLICK TO TEST MODES
+              </span>
+            </div>
             <div class="sim-mode-toggle">
-              <button class="mode-btn active" id="btnModeBaseline">1. Baseline (192 ppm)</button>
-              <button class="mode-btn" id="btnModeOptimized">2. Project Ag-X (≤25 ppm)</button>
+              <button class="mode-btn active" id="btnModeBaseline" title="Click to view un-optimized Baseline operations">
+                <span style="font-size: 0.85rem;">⚠️</span>
+                <span>1. Baseline (192 ppm)</span>
+              </button>
+              <button class="mode-btn lure-pulse" id="btnModeOptimized" title="Click to activate Project Ag-X AI & Settling optimization">
+                <span style="font-size: 0.85rem;">⚡</span>
+                <span>2. Project Ag-X (&le;25 ppm)</span>
+                <span class="lure-badge">TEST GAINS</span>
+              </button>
             </div>
           </div>
 
@@ -997,7 +1010,7 @@
       btnModeBaseline.addEventListener('click', () => {
         simMode = 'baseline';
         btnModeBaseline.className = 'mode-btn active';
-        btnModeOptimized.className = 'mode-btn';
+        btnModeOptimized.className = 'mode-btn lure-pulse';
         telemetryTemp.textContent = '1,280 °C';
         telemetryVisc.textContent = '0.52 Pa·s';
         telemetrySettling.textContent = '10 min';

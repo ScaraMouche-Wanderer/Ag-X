@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Ag-X — Silver Loss Reduction | Fumer Plant Technical Proposal -By Pratham</title>
+  <meta name="description" content="Project Ag-X: Engineering roadmap and hybrid digital twin architecture for reducing Silver (Ag) loss in fumer plant slag from 192 ppm to ≤25 ppm. -By Pratham." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Top Slim Scroll Progress Bar -->
+  <div class="scroll-progress-bar" id="topProgressBar"></div>
+
+  <!-- =========================================================
+       NAVIGATION BAR (Project Ag-X)
+       ========================================================= -->
+  <header class="navbar" id="navbar">
+    <div class="container">
+      <a href="#hero" class="nav-brand">
+        <div class="brand-badge">
+          Ag
+          <span class="sub">X</span>
+        </div>
+        <div>
+          <span>PROJECT Ag-X</span>
+          <span style="font-size: 0.65rem; font-weight: 600; display: block; color: var(--copper-700); letter-spacing: 0.05em; text-transform: uppercase;">Silver Recovery Programme</span>
+        </div>
+      </a>
+
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#diagnosis">Diagnosis</a></li>
+        <li><a href="#simulator">Simulator</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#digital-twin">Digital Twin</a></li>
+        <li><a href="#business-case">Economics</a></li>
+        <li><a href="#kpi-dashboard">KPIs</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="#simulator" class="btn-nav-action">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Furnace Simulator
+        </a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       HERO SECTION (Clear & Simple Executive Overview)
+       ========================================================= -->
+  <section class="hero-section" id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        
+        <!-- Left: Executive Summary & Core Numbers -->
+        <div class="hero-left reveal">
+          <div class="hero-badge-container">
+            <span class="badge-tag">
+              <span class="pulse-dot"></span>
+              Project Ag-X · Technical Proposal
+            </span>
+          </div>
+
+          <h1 class="hero-title">
+            Silver Loss Reduction in the <span class="highlight-copper">Fumer Plant</span>
+          </h1>
+
+          <p class="hero-description">
+            A dual-track engineering programme engineered to bridge the <strong>192&nbsp;ppm &rarr; &le;25&nbsp;ppm</strong> deficit. Physical settling and redox interventions (Track&nbsp;A) combined with a physics-constrained AI Digital Twin (Track&nbsp;B) for sustained recovery.
+          </p>
+
+          <div class="hero-cta-group">
+            <a href="#digital-twin" class="btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+              Explore Digital Twin Core
+            </a>
+            <a href="#roadmap" class="btn-secondary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              View Strategic Roadmap
+            </a>
+          </div>
+
+          <!-- 3-Pill Executive Metric Strip -->
+          <div class="hero-metrics-bar">
+            <div class="metric-pill">
+              <div class="metric-label">Baseline Slag Ag</div>
+              <div class="metric-val val-red">192 <span style="font-size: 0.75rem; font-weight: 600;">ppm</span></div>
+              <div class="metric-sub">Current unrecovered loss</div>
+            </div>
+            <div class="metric-pill">
+              <div class="metric-label">Target Slag Ag</div>
+              <div class="metric-val val-green">&le; 25 <span style="font-size: 0.75rem; font-weight: 600;">ppm</span></div>
+              <div class="metric-sub">&ge;90% batch compliance</div>
+            </div>
+            <div class="metric-pill">
+              <div class="metric-label">Annual Value</div>
+              <div class="metric-val val-gold">+₹141.95 Cr</div>
+              <div class="metric-sub">536,920 oz Ag / yr</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Industrial Hero Visual -->
+        <div class="hero-right reveal reveal-delay-1">
+          <div class="hero-author-header">
+            <div class="by-pratham-hero">
+              <span class="by-pratham-text">-By Pratham</span>
+            </div>
+          </div>
+          <div class="hero-visual-card">
+            <div class="hero-image-wrap">
+              <img src="assets/hero_furnace.jpg" alt="Fumer blast furnace operation" />
+              <div class="hero-floating-tag floating-tag-top">
+                <div class="tag-title">Bath Operating Temp</div>
+                <div class="tag-number">1,240 °C</div>
+              </div>
+              <div class="hero-floating-tag floating-tag-bottom">
+                <div class="tag-title">Ag Recovery Gain</div>
+                <div class="tag-number">+87.0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SECTION 1: LOSS MECHANISMS & DIAGNOSIS
+       ========================================================= -->
+  <section class="section section-white" id="diagnosis">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">
+          <span class="eyebrow-line"></span>
+          Diagnosis
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-heading">Root-Cause Loss Mechanisms</h2>
+        <p class="section-lead">
+          SEM/EDS microscopy determines whether silver loss is caused by un-settled bullion prills or dissolved chemical species.
+        </p>
+      </div>
+
+      <!-- Key Takeaway Banner -->
+      <div class="exec-takeaway-bar reveal">
+        <span class="takeaway-tag">Key Insight</span>
+        <span>70–80% of current silver losses are driven by <strong>Mechanical Entrainment</strong> of un-settled bullion prills due to short hold times and high slag viscosity.</span>
+      </div>
+
+      <!-- Grid with 3 Mechanism Cards + Real SEM/EDS Microstructure Photo -->
+      <div class="diagnosis-layout-grid">
+        
+        <!-- Left: 3 Mechanism Cards & Decision Tree -->
+        <div>
+          <div class="mechanisms-grid">
+            <div class="mechanism-card mech-entrainment reveal reveal-delay-1">
+              <div class="card-icon-box">⚙️</div>
+              <h3>1. Mechanical Entrainment</h3>
+              <p>Microscopic bullion prills remain physically suspended in viscous slag and fail to settle before tapping.</p>
+              <div class="mechanism-meta">
+                <div class="meta-row"><span class="meta-title">Share of Loss:</span><span class="meta-desc" style="color: var(--steel-600);">70–80% (Dominant)</span></div>
+                <div class="meta-row"><span class="meta-title">Primary Fix:</span><span class="meta-desc">Settling hold time &amp; launder redesign</span></div>
+              </div>
+            </div>
+
+            <div class="mechanism-card mech-dissolution reveal reveal-delay-2">
+              <div class="card-icon-box">🧪</div>
+              <h3>2. Chemical Dissolution</h3>
+              <p>Ionic silver dissolves into silicate melt as an oxide/sulfide complex at high FeO and oxidizing redox.</p>
+              <div class="mechanism-meta">
+                <div class="meta-row"><span class="meta-title">Share of Loss:</span><span class="meta-desc" style="color: var(--copper-700);">15–20%</span></div>
+                <div class="meta-row"><span class="meta-title">Primary Fix:</span><span class="meta-desc">Reductant dosing &amp; flux basicity</span></div>
+              </div>
+            </div>
+
+            <div class="mechanism-card mech-fuming reveal reveal-delay-3">
+              <div class="card-icon-box">💨</div>
+              <h3>3. Volatilization</h3>
+              <p>Volatile Ag sub-species vaporize in high-temp zones and report to baghouse flue dust.</p>
+              <div class="mechanism-meta">
+                <div class="meta-row"><span class="meta-title">Share of Loss:</span><span class="meta-desc" style="color: var(--teal-600);">&lt; 5%</span></div>
+                <div class="meta-row"><span class="meta-title">Primary Fix:</span><span class="meta-desc">Tuyere blast profile balancing</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diagnostic Protocol Branching Tree -->
+          <div class="diagnostic-callout-card reveal">
+            <div class="diag-header">
+              <div class="diag-title-group">
+                <span style="font-size: 1.15rem;">🔬</span>
+                <div>
+                  <h3 style="font-size: 1rem; font-weight: 700;">Phase 1 Protocol: SEM / EDS Slag Profiling</h3>
+                </div>
+              </div>
+              <span style="font-size: 0.685rem; font-weight: 700; background: var(--steel-100); color: var(--steel-700); padding: 0.2rem 0.55rem; border-radius: 9999px;">Duration: 1–2 Weeks</span>
+            </div>
+
+            <div class="diag-grid">
+              <div class="diag-branch" style="border-left: 3px solid var(--steel-600);">
+                <div class="diag-branch-header" style="color: var(--steel-700);">Scenario A: Visible Bullion Prills</div>
+                <p>SEM confirms suspended metallic droplets &rarr; <strong>Mechanical Entrainment dominates</strong>. Immediate focus: settling stage, hold duration (45 min), and launder fluid dynamics.</p>
+              </div>
+
+              <div class="diag-branch" style="border-left: 3px solid var(--copper-600);">
+                <div class="diag-branch-header" style="color: var(--copper-700);">Scenario B: Homogeneous Matrix</div>
+                <p>SEM shows uniform Ag dispersion without prills &rarr; <strong>Chemical Dissolution dominates</strong>. Immediate focus: FeO reduction, flux basicity (CaO/SiO<sub>2</sub> = 1.15), and collector pool availability.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: SEM/EDS Microstructure Image -->
+        <div class="sem-photo-card reveal reveal-delay-2">
+          <div class="sem-image-container">
+            <img src="assets/sem_microstructure.jpg" alt="Scanning Electron Microscope SEM EDS Micrograph of Ag-Pb bullion prills trapped in silicate slag" />
+          </div>
+          <div class="sem-caption-box">
+            <div class="sem-tag-row">
+              <span class="sem-title">SEM / EDS Slag Micrograph</span>
+              <span class="sem-badge">500x Magnification</span>
+            </div>
+            <p class="sem-desc">
+              Cross-section showing <strong>Ag-Pb bullion prills (yellow/orange)</strong> mechanically trapped in the dense silicate matrix (dark grey), confirming physical settling priority.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SECTION 2: FURNACE SIMULATOR
+       ========================================================= -->
+  <section class="section section-alt" id="simulator">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">
+          <span class="eyebrow-line"></span>
+          Simulation
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-heading">Furnace Dynamics &amp; Blast Simulator</h2>
+        <p class="section-lead">
+          Visualizing multi-phase behavior: submerged tuyere blast convection, slag/bullion separation, and real-time digital twin setpoints.
+        </p>
+      </div>
+
+      <div class="furnace-simulation-container reveal">
+        <!-- Simulator Command Bar -->
+        <div class="sim-controls-bar">
+          <div class="sim-status-group">
+            <span class="sim-title">FURNACE CONTROLLER:</span>
+            <div class="sim-mode-toggle">
+              <button class="mode-btn active" id="btnModeBaseline">1. Baseline (192 ppm)</button>
+              <button class="mode-btn" id="btnModeOptimized">2. Project Ag-X (≤25 ppm)</button>
+            </div>
+          </div>
+
+          <div class="sim-telemetry-strip">
+            <div class="telemetry-item">
+              <span class="telemetry-label">Bath Temp</span>
+              <span class="telemetry-val" id="telemetryTemp">1,280 °C</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">Slag Viscosity</span>
+              <span class="telemetry-val" id="telemetryVisc">0.52 Pa·s</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">Settling Time</span>
+              <span class="telemetry-val" id="telemetrySettling">10 min</span>
+            </div>
+            <div class="telemetry-item">
+              <span class="telemetry-label">Real-time Slag Ag</span>
+              <span class="telemetry-val alert-red" id="telemetryAg">192.4 ppm</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Canvas Animation Area -->
+        <div class="furnace-canvas-area">
+          <canvas id="fumerInteractiveCanvas" width="1200" height="520"></canvas>
+        </div>
+
+        <!-- Interactive Equipment Legend -->
+        <div class="equipment-legend-bar">
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #3B82F6;"></div>
+            <div>
+              <h4>1. Submerged Tuyere Blast</h4>
+              <p>Injects preheated air and coal reductant into molten bath.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #64748B;"></div>
+            <div>
+              <h4>2. Slag Layer (Density ~3.5)</h4>
+              <p>Silicate matrix carrying dissolved and entrained silver.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #D97706;"></div>
+            <div>
+              <h4>3. Molten Collector (~9.0)</h4>
+              <p>Dense bullion pool capturing precious metals.</p>
+            </div>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: #10B981;"></div>
+            <div>
+              <h4>4. Digital Twin Telemetry</h4>
+              <p>Real-time thermodynamic streaming and advisory setpoints.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SECTION 3: STRATEGIC ROADMAP & 8 PHASES
+       ========================================================= -->
+  <section class="section section-white" id="roadmap">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">
+          <span class="eyebrow-line"></span>
+          Roadmap
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-heading">Two-Track Implementation Plan</h2>
+        <p class="section-lead">
+          Track A physical fixes close the 192&nbsp;&rarr;&nbsp;25&nbsp;ppm gap. Track B digital twin sustains long-term target compliance.
+        </p>
+      </div>
+
+      <!-- Roadmap Image Display -->
+      <div class="roadmap-visual-box reveal">
+        <img src="assets/figure_1.png" alt="Project Ag-X Strategic Roadmap: Track A physical fixes and Track B digital twin ecosystem" class="roadmap-figure-img" />
+      </div>
+
+      <!-- Dual Track Breakdown -->
+      <div class="track-comparison-grid" style="margin-bottom: 2.25rem;">
+        <div class="track-box track-a reveal reveal-delay-1">
+          <div class="track-header-row">
+            <h3 class="track-title">TRACK A: Metallurgical Fixes</h3>
+            <span class="track-tag">Drives 192 &rarr; 25 ppm</span>
+          </div>
+          <p class="track-desc">
+            Direct physical levers that alter phase equilibria, settling residence, and slag rheology to eliminate loss at the furnace source.
+          </p>
+          <ul class="track-phase-list">
+            <li>
+              <span class="phase-badge-num">1</span>
+              <div><strong>Phase 1 — Diagnosis (1–2 wks):</strong> Slag SEM/EDS confirms entrainment vs dissolution split.</div>
+            </li>
+            <li>
+              <span class="phase-badge-num">2</span>
+              <div><strong>Phase 2 — Quick-Win Trials (4–8 wks):</strong> Settling hold time, reductant dosing, basicity fluxing.</div>
+            </li>
+            <li>
+              <span class="phase-badge-num">3</span>
+              <div><strong>Phase 3 — Process Fix (3–6 mo):</strong> Settling/cleaning stage, redesigned launder runner, feed blending.</div>
+            </li>
+            <li>
+              <span class="phase-badge-num">4</span>
+              <div><strong>Phase 4 — Hold Target (Ongoing):</strong> SOP enforcement and control limits for sustained &le;25 ppm.</div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="track-box track-b reveal reveal-delay-2">
+          <div class="track-header-row">
+            <h3 class="track-title">TRACK B: Digital Twin Ecosystem</h3>
+            <span class="track-tag">Holds Gains &amp; Prevents Drift</span>
+          </div>
+          <p class="track-desc">
+            Collects batch-linked historian data from Day 1, progressively activating predictive modeling and constrained optimization.
+          </p>
+          <ul class="track-phase-list">
+            <li>
+              <span class="phase-badge-num">5</span>
+              <div><strong>Phase 5 — Data Foundation (Day 1):</strong> 1-min OSIsoft PI historian &plus; LIMS lab synchronization &plus; MES batch linkage.</div>
+            </li>
+            <li>
+              <span class="phase-badge-num">6</span>
+              <div><strong>Phase 6 — Predictive ML (After Ph.2):</strong> Real-time Ag ppm forecast before physical lab assay arrives.</div>
+            </li>
+            <li>
+              <span class="phase-badge-num">7</span>
+              <div><strong>Phase 7 — Physics+ML Twin (After Ph.3):</strong> Mass/heat balance &plus; FactSage thermodynamics &plus; ML correction layer.</div>
+            </li>
+            <li>
+              <span class="phase-badge-num">8</span>
+              <div><strong>Phase 8 — Closed-Loop (Long-term):</strong> Operator advisory setpoints leading to validated DCS/PLC auto-execution.</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Filter Controls & 8 Phase Grid -->
+      <div class="timeline-filter-bar reveal">
+        <button class="timeline-tab active" data-filter="all">All 8 Phases</button>
+        <button class="timeline-tab" data-filter="track-a">Track A (Metallurgy)</button>
+        <button class="timeline-tab" data-filter="track-b">Track B (Digital Twin)</button>
+      </div>
+
+      <div class="timeline-flow-grid">
+        <div class="phase-card phase-track-a reveal" data-track="track-a">
+          <div class="phase-top">
+            <span class="phase-num">Phase 1 · Track A</span>
+            <span class="phase-time">1–2 wks</span>
+          </div>
+          <h3>Root-Cause Diagnosis</h3>
+          <p>Slag SEM/EDS across batches; confirm entrainment vs dissolution split.</p>
+        </div>
+
+        <div class="phase-card phase-track-a reveal" data-track="track-a">
+          <div class="phase-top">
+            <span class="phase-num">Phase 2 · Track A</span>
+            <span class="phase-time">4–8 wks</span>
+          </div>
+          <h3>Quick-Win Trials</h3>
+          <p>Extend settling time (45 min), optimize reductant dosing, and adjust basicity.</p>
+        </div>
+
+        <div class="phase-card phase-track-a reveal" data-track="track-a">
+          <div class="phase-top">
+            <span class="phase-num">Phase 3 · Track A</span>
+            <span class="phase-time">3–6 mo</span>
+          </div>
+          <h3>Process / Design Fix</h3>
+          <p>Slag settling stage, launder/taphole redesign, and raw feed blending.</p>
+        </div>
+
+        <div class="phase-card phase-track-a reveal" data-track="track-a">
+          <div class="phase-top">
+            <span class="phase-num">Phase 4 · Track A</span>
+            <span class="phase-time">Ongoing</span>
+          </div>
+          <h3>Stabilize &amp; Hold Target</h3>
+          <p>Standard Operating Procedures and control limits for sustained &le;25 ppm.</p>
+        </div>
+
+        <div class="phase-card phase-track-b reveal" data-track="track-b">
+          <div class="phase-top">
+            <span class="phase-num">Phase 5 · Track B</span>
+            <span class="phase-time">Day 1</span>
+          </div>
+          <h3>Data Foundation</h3>
+          <p>OSIsoft PI historian (1-min tags) &plus; LIMS lab data &plus; MES batch linkage.</p>
+        </div>
+
+        <div class="phase-card phase-track-b reveal" data-track="track-b">
+          <div class="phase-top">
+            <span class="phase-num">Phase 6 · Track B</span>
+            <span class="phase-time">After Ph.2</span>
+          </div>
+          <h3>Predictive ML Model</h3>
+          <p>Real-time machine learning prediction estimating Ag ppm ahead of lab assay.</p>
+        </div>
+
+        <div class="phase-card phase-track-b reveal" data-track="track-b">
+          <div class="phase-top">
+            <span class="phase-num">Phase 7 · Track B</span>
+            <span class="phase-time">After Ph.3</span>
+          </div>
+          <h3>Physics + ML Twin</h3>
+          <p>Mass/energy balance, slag thermodynamics, and ML correction layer.</p>
+        </div>
+
+        <div class="phase-card phase-track-b reveal" data-track="track-b">
+          <div class="phase-top">
+            <span class="phase-num">Phase 8 · Track B</span>
+            <span class="phase-time">Long-term</span>
+          </div>
+          <h3>Closed-Loop Control</h3>
+          <p>Operator advisory dashboard evolving into DCS/PLC setpoint auto-execution.</p>
+        </div>
+      </div>
+
+      <!-- Target Gate Box -->
+      <div class="phase-gate-card reveal">
+        <div class="phase-gate-text">
+          <h4>GOVERNANCE GATE: Target Performance Requirement</h4>
+          <p>Ag in slag &le; 25 ppm sustained across &ge; 90% of production batches before advancing to closed-loop automation.</p>
+        </div>
+        <div class="gate-badge-box">
+          Target: &le; 25 ppm (&ge;90% Batches)
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SECTION 4: DIGITAL TWIN CORE ARCHITECTURE
+       ========================================================= -->
+  <section class="section section-alt" id="digital-twin">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">
+          <span class="eyebrow-line"></span>
+          Core Methodology &amp; Architecture
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-heading">Hybrid Digital Twin Architecture</h2>
+        <p class="section-lead">
+          Combining first-principles slag thermodynamics with machine learning correction to eliminate operator variance and lock in the &le;25&nbsp;ppm target.
+        </p>
+      </div>
+
+      <!-- Clean Visual Card with High-Res Architecture Diagram -->
+      <div class="twin-clean-card reveal">
+        <img src="assets/figure_2.png" alt="Project Ag-X Digital Twin Architecture Flow" />
+      </div>
+
+      <div class="twin-caption-strip reveal reveal-delay-1">
+        <div>
+          <strong>Architecture Core:</strong> FactSage / Thermo-Calc mass &amp; enthalpy balance with LightGBM residual learning.
+        </div>
+        <div>
+          <strong>Closed-Loop Safety:</strong> Hard thermodynamic boundaries strictly enforce safe tapping viscosity and bath superheat.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SECTION 5: ROI MODEL & FINANCIAL ECONOMICS (EXECUTIVE UI)
+       ========================================================= -->
+  <section class="section section-white" id="business-case">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">
+          <span class="eyebrow-line"></span>
+          Financial Economics
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-heading">Silver Recovery Value &amp; ROI Model</h2>
+        <p class="section-lead">
+          Financial forecast based on plant annual throughput, silver commodity pricing, and target recovery compliance.
+        </p>
+      </div>
+
+      <div class="roi-calculator-box reveal">
+        <!-- Left: Interactive Inputs Column -->
+        <div class="calc-inputs-col">
+          <h3>Plant Parameters &amp; Assumptions</h3>
+          <p>Adjust annual tonnage and market price to calculate net silver recovered and projected cash generation.</p>
+
+          <!-- Input 1: Slag Tonnage -->
+          <div class="calc-input-group">
+            <div class="calc-input-label">
+              <span>Annual Slag Production</span>
+              <span class="curr-val" id="valTonnageDisplay">100,000 T / yr</span>
+            </div>
+            <input type="range" min="30000" max="250000" step="5000" value="100000" class="calc-range-slider" id="sliderTonnage" />
+          </div>
+
+          <!-- Input 2: Silver Price in Rupee -->
+          <div class="calc-input-group">
+            <div class="calc-input-label">
+              <span>Silver Market Price (₹ / kg)</span>
+              <span class="curr-val" id="valPriceDisplay">₹85,000 / kg (₹85.0/g)</span>
+            </div>
+            <input type="range" min="60000" max="130000" step="1000" value="85000" class="calc-range-slider" id="sliderPrice" />
+          </div>
+
+          <!-- Input 3: Ag Target -->
+          <div class="calc-input-group">
+            <div class="calc-input-label">
+              <span>Target Ag in Slag</span>
+              <span class="curr-val" id="valTargetDisplay">25 ppm (Delta: -167 ppm)</span>
+            </div>
+            <input type="range" min="15" max="50" step="1" value="25" class="calc-range-slider" id="sliderTarget" />
+          </div>
+        </div>
+
+        <!-- Right: Executive Results Grid -->
+        <div class="calc-results-panel">
+          <div class="result-card-item span-full">
+            <div class="res-label">Gross Annual Net Value</div>
+            <div class="res-big-value" style="color: #FBBF24;" id="resGrossValue">₹141.95 Crore</div>
+            <div class="res-subtext" id="resGrossSubtext">₹1,41,95,00,000 / yr recurring net value generation</div>
+          </div>
+
+          <div class="result-card-item">
+            <div class="res-label">Annual Silver Recovered</div>
+            <div class="res-big-value" style="color: #34D399; font-size: 1.5rem;" id="resAgRecoveredKg">16,700 kg</div>
+            <div class="res-subtext" id="resAgRecoveredOz">&asymp; 536,920 Troy Oz / yr</div>
+          </div>
+
+          <div class="result-card-item">
+            <div class="res-label">Capital Payback Period</div>
+            <div class="res-big-value" style="color: #60A5FA; font-size: 1.5rem;">&lt; 2.5 Months</div>
+            <div class="res-subtext">Total Track A &amp; B capital amortization</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SECTION 6: PERFORMANCE PROJECTIONS & KPIS
+       ========================================================= -->
+  <section class="section section-alt" id="kpi-dashboard">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">
+          <span class="eyebrow-line"></span>
+          Governance
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-heading">Performance Projections &amp; KPIs</h2>
+        <p class="section-lead">
+          Target trajectory across phases and operational performance governance metrics.
+        </p>
+      </div>
+
+      <!-- Performance Figure 3 -->
+      <div class="perf-figure-card reveal">
+        <img src="assets/figure_3.png" alt="Project Ag-X Digital Twin Performance Projections: Ag loss trajectory and model accuracy convergence" style="width: 100%; border-radius: var(--radius-md);" />
+      </div>
+
+      <!-- KPI Table -->
+      <div class="kpi-board-container reveal">
+        <table class="kpi-table-formal">
+          <thead>
+            <tr>
+              <th>Key Performance Indicator</th>
+              <th>Baseline State</th>
+              <th>Target Specification</th>
+              <th>Cadence</th>
+              <th>Governance Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Average Ag in Slag</strong></td>
+              <td><span class="kpi-badge-baseline">192 ppm</span></td>
+              <td><span class="kpi-badge-target">&le; 25 ppm</span></td>
+              <td>Per batch</td>
+              <td>Plant Metallurgist</td>
+            </tr>
+            <tr>
+              <td><strong>% Batches &le; 25 ppm</strong></td>
+              <td><span class="kpi-badge-baseline">Under 15%</span></td>
+              <td><span class="kpi-badge-target">&ge; 90%</span></td>
+              <td>Weekly rolling</td>
+              <td>Operations Superintendent</td>
+            </tr>
+            <tr>
+              <td><strong>Ag Recovery to Product</strong></td>
+              <td><span class="kpi-badge-baseline">Sub-optimal</span></td>
+              <td><span class="kpi-badge-target">Maximize subject to &le;25 ppm</span></td>
+              <td>Per batch</td>
+              <td>Lead Process Engineer</td>
+            </tr>
+            <tr>
+              <td><strong>Digital Twin Prediction Error</strong></td>
+              <td><span class="kpi-badge-baseline">N/A (pre-build)</span></td>
+              <td><span class="kpi-badge-target">&plusmn; 5 ppm</span> (Mature model)</td>
+              <td>Rolling 30-batch</td>
+              <td>Data / ML Lead</td>
+            </tr>
+            <tr>
+              <td><strong>Energy Consumption / Batch</strong></td>
+              <td><span class="kpi-badge-baseline">Baseline</span></td>
+              <td><span class="kpi-badge-target">No material increase vs baseline</span></td>
+              <td>Per batch</td>
+              <td>Energy &amp; Utilities Lead</td>
+            </tr>
+            <tr>
+              <td><strong>Flux &amp; Reductant Consumption</strong></td>
+              <td><span class="kpi-badge-baseline">Baseline</span></td>
+              <td><span class="kpi-badge-target">Optimized per thermodynamic window</span></td>
+              <td>Per batch</td>
+              <td>Pyrometallurgy Lead</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SECTION 7: EXECUTIVE SUMMARY & SIGN-OFF (EXECUTIVE UI)
+       ========================================================= -->
+  <section class="section section-white" id="summary">
+    <div class="container">
+      <div class="section-head reveal">
+        <div class="section-eyebrow">
+          <span class="eyebrow-line"></span>
+          Strategic Sign-Off
+          <span class="eyebrow-line"></span>
+        </div>
+        <h2 class="section-heading">Executive Summary &amp; Technical Foundation</h2>
+        <p class="section-lead">
+          Synthesis of metallurgical diagnosis, digital twin architecture, and financial return.
+        </p>
+      </div>
+
+      <!-- Executive Card -->
+      <div class="executive-summary-card reveal">
+        <span class="exec-tag">Project Ag-X · Proposal Summary</span>
+        <h3 class="exec-title">A Validated Roadmap for Sustainable Silver Recovery</h3>
+        <p class="exec-statement">
+          The 192&nbsp;&rarr;&nbsp;25&nbsp;ppm gap is primarily driven by mechanical entrainment of bullion prills. Track&nbsp;A physical settling and redox controls establish the low-loss regime; the Track&nbsp;B Hybrid Digital Twin locks in those gains with closed-loop thermodynamic safety envelopes.
+        </p>
+
+        <div class="exec-pillars-row">
+          <div class="exec-pillar-item">
+            <h5>⚡ 1. Root-Cause Diagnosis</h5>
+            <p>Phase 1 SEM/EDS slag analysis delivers decisive metallurgical confirmation within 14 days.</p>
+          </div>
+          <div class="exec-pillar-item">
+            <h5>🛡️ 2. Physics-Backed Twin</h5>
+            <p>Hard FactSage thermodynamic constraints ensure complete process safety before automated execution.</p>
+          </div>
+          <div class="exec-pillar-item">
+            <h5>📈 3. Immediate Value Creation</h5>
+            <p>Over ₹140 Crore in recurring annual silver recovery with a project payback under three months.</p>
+          </div>
+        </div>
+
+        <a href="#hero" class="btn-primary" style="background: var(--copper-700); color: #FFFFFF; box-shadow: 0 4px 14px rgba(0,0,0,0.3);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          Back to Top of Proposal
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FOOTER
+       ========================================================= -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-row">
+        <div>
+          <strong>Project Ag-X: Fumer Plant Silver Loss Reduction Programme</strong> &nbsp;&bull;&nbsp; Technical Proposal
+        </div>
+        <div class="footer-links">
+          <a href="#diagnosis">Diagnosis</a>
+          <a href="#simulator">Simulator</a>
+          <a href="#roadmap">Roadmap</a>
+          <a href="#digital-twin">Digital Twin</a>
+          <a href="#business-case">Economics</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       CUTE SCROLL METER & PROGRESS INDICATOR (Floating Bottom Right)
+       ========================================================= -->
+  <div class="scroll-meter-widget" id="scrollMeterWidget" title="Click to scroll to top">
+    <div class="meter-ring-wrap">
+      <svg class="meter-ring-svg" viewBox="0 0 32 32">
+        <circle class="meter-ring-bg" cx="16" cy="16" r="14" fill="none" stroke-width="2.5" />
+        <circle class="meter-ring-fill" id="meterRingFill" cx="16" cy="16" r="14" fill="none" stroke-width="2.5" />
+      </svg>
+      <span class="meter-icon" id="meterIcon">⚡</span>
+    </div>
+    <div class="meter-info">
+      <span class="meter-percentage" id="meterPercentage">0%</span>
+      <span class="meter-label" id="meterRemaining">100% to go</span>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       INTERACTIVE JAVASCRIPT LOGIC
+       ========================================================= -->
+  <script>
+    /* ============================================================
+       1. Scroll Reveal Observer
+       ============================================================ */
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.08 });
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    /* ============================================================
+       2. Sticky Navbar Styling & Scroll Meter Update
+       ============================================================ */
+    const navbar = document.getElementById('navbar');
+    const topProgressBar = document.getElementById('topProgressBar');
+    const meterRingFill = document.getElementById('meterRingFill');
+    const meterPercentage = document.getElementById('meterPercentage');
+    const meterRemaining = document.getElementById('meterRemaining');
+    const meterIcon = document.getElementById('meterIcon');
+    const scrollMeterWidget = document.getElementById('scrollMeterWidget');
+
+    const circumference = 2 * Math.PI * 14; // ≈ 87.96
+
+    function updateScrollMeter() {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrollFraction = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
+      const percentage = Math.round(scrollFraction * 100);
+
+      // Top progress bar
+      if (topProgressBar) {
+        topProgressBar.style.width = percentage + '%';
+      }
+
+      // Cute Meter Ring
+      if (meterRingFill) {
+        const offset = circumference - (scrollFraction * circumference);
+        meterRingFill.style.strokeDashoffset = offset;
+      }
+
+      if (meterPercentage) {
+        meterPercentage.textContent = percentage + '%';
+      }
+
+      if (meterRemaining) {
+        if (percentage >= 98) {
+          meterRemaining.textContent = 'Complete! 🎉';
+          if (meterIcon) meterIcon.textContent = '🚀';
+        } else {
+          meterRemaining.textContent = (100 - percentage) + '% to go';
+          if (meterIcon) meterIcon.textContent = percentage > 50 ? '🔥' : '⚡';
+        }
+      }
+
+      if (scrollTop > 30) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    }
+
+    window.addEventListener('scroll', updateScrollMeter, { passive: true });
+    updateScrollMeter();
+
+    if (scrollMeterWidget) {
+      scrollMeterWidget.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    /* ============================================================
+       3. Mobile Navigation Toggle
+       ============================================================ */
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    const navLinks = document.getElementById('navLinks');
+    mobileBtn.addEventListener('click', () => {
+      if (navLinks.style.display === 'flex') {
+        navLinks.style.display = 'none';
+      } else {
+        navLinks.style.display = 'flex';
+        navLinks.style.flexDirection = 'column';
+        navLinks.style.position = 'absolute';
+        navLinks.style.top = '70px';
+        navLinks.style.left = '0';
+        navLinks.style.right = '0';
+        navLinks.style.background = '#FFFFFF';
+        navLinks.style.padding = '1.5rem 2rem';
+        navLinks.style.boxShadow = 'var(--shadow-md)';
+        navLinks.style.borderBottom = '1px solid var(--border-light)';
+      }
+    });
+
+    /* ============================================================
+       4. Timeline Filter Tabs
+       ============================================================ */
+    const timelineTabs = document.querySelectorAll('.timeline-tab');
+    const phaseCards = document.querySelectorAll('.phase-card');
+
+    timelineTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        timelineTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const filter = tab.getAttribute('data-filter');
+
+        phaseCards.forEach(card => {
+          if (filter === 'all') {
+            card.style.display = 'flex';
+          } else {
+            const track = card.getAttribute('data-track');
+            card.style.display = (track === filter) ? 'flex' : 'none';
+          }
+        });
+      });
+    });
+
+    /* ============================================================
+       5. Interactive ROI Calculator Logic (Indian Rupee INR)
+       ============================================================ */
+    const sliderTonnage = document.getElementById('sliderTonnage');
+    const sliderPrice = document.getElementById('sliderPrice');
+    const sliderTarget = document.getElementById('sliderTarget');
+
+    const valTonnageDisplay = document.getElementById('valTonnageDisplay');
+    const valPriceDisplay = document.getElementById('valPriceDisplay');
+    const valTargetDisplay = document.getElementById('valTargetDisplay');
+
+    const resAgRecoveredKg = document.getElementById('resAgRecoveredKg');
+    const resAgRecoveredOz = document.getElementById('resAgRecoveredOz');
+    const resGrossValue = document.getElementById('resGrossValue');
+    const resGrossSubtext = document.getElementById('resGrossSubtext');
+
+    function formatIndianCurrency(num) {
+      if (num >= 10000000) {
+        const cr = (num / 10000000).toFixed(2);
+        return '₹' + cr + ' Crore';
+      } else if (num >= 100000) {
+        const lakh = (num / 100000).toFixed(2);
+        return '₹' + lakh + ' Lakh';
+      } else {
+        return '₹' + Math.round(num).toLocaleString('en-IN');
+      }
+    }
+
+    function calculateROI() {
+      const tonnage = parseFloat(sliderTonnage.value);
+      const pricePerKg = parseFloat(sliderPrice.value);
+      const targetPpm = parseFloat(sliderTarget.value);
+      const baselinePpm = 192.0;
+
+      const deltaPpm = Math.max(0, baselinePpm - targetPpm);
+      const recoveredKg = (tonnage * deltaPpm) / 1000.0;
+      const recoveredTroyOz = recoveredKg * 32.1507;
+      const grossValue = recoveredKg * pricePerKg;
+
+      valTonnageDisplay.textContent = Number(tonnage).toLocaleString('en-IN') + ' T / yr';
+      valPriceDisplay.textContent = '₹' + Number(pricePerKg).toLocaleString('en-IN') + ' / kg (₹' + (pricePerKg / 1000).toFixed(1) + '/g)';
+      valTargetDisplay.textContent = targetPpm + ' ppm (Delta: -' + deltaPpm.toFixed(0) + ' ppm)';
+
+      resAgRecoveredKg.textContent = Number(Math.round(recoveredKg)).toLocaleString('en-IN') + ' kg';
+      resAgRecoveredOz.textContent = '≈ ' + Number(Math.round(recoveredTroyOz)).toLocaleString('en-IN') + ' Troy Oz / yr';
+      resGrossValue.textContent = formatIndianCurrency(grossValue);
+      if (resGrossSubtext) {
+        resGrossSubtext.textContent = '₹' + Number(Math.round(grossValue)).toLocaleString('en-IN') + ' / yr recurring net value generation';
+      }
+    }
+
+    sliderTonnage.addEventListener('input', calculateROI);
+    sliderPrice.addEventListener('input', calculateROI);
+    sliderTarget.addEventListener('input', calculateROI);
+    calculateROI();
+
+    /* ============================================================
+       6. Interactive Furnace Simulator Canvas (Seamless Animation)
+       ============================================================ */
+    (function() {
+      const canvas = document.getElementById('fumerInteractiveCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const dpr = window.devicePixelRatio || 1;
+      const W = 1200;
+      const H = 520;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx.scale(dpr, dpr);
+
+      let simMode = 'baseline';
+      let time = 0;
+
+      let sparks = [];
+      let slagPrills = [];
+      let fumeParticles = [];
+      let feedDrops = [];
+      let convectionStreams = [];
+
+      for (let i = 0; i < 18; i++) {
+        convectionStreams.push({
+          x: 370 + Math.random() * 260,
+          y: 310 + Math.random() * 70,
+          angle: Math.random() * Math.PI * 2,
+          speed: 0.6 + Math.random() * 0.8,
+          radius: 15 + Math.random() * 25
+        });
+      }
+
+      const btnModeBaseline = document.getElementById('btnModeBaseline');
+      const btnModeOptimized = document.getElementById('btnModeOptimized');
+      const telemetryTemp = document.getElementById('telemetryTemp');
+      const telemetryVisc = document.getElementById('telemetryVisc');
+      const telemetrySettling = document.getElementById('telemetrySettling');
+      const telemetryAg = document.getElementById('telemetryAg');
+
+      btnModeBaseline.addEventListener('click', () => {
+        simMode = 'baseline';
+        btnModeBaseline.className = 'mode-btn active';
+        btnModeOptimized.className = 'mode-btn';
+        telemetryTemp.textContent = '1,280 °C';
+        telemetryVisc.textContent = '0.52 Pa·s';
+        telemetrySettling.textContent = '10 min';
+        telemetryAg.textContent = '192.4 ppm';
+        telemetryAg.className = 'telemetry-val alert-red';
+      });
+
+      btnModeOptimized.addEventListener('click', () => {
+        simMode = 'optimized';
+        btnModeBaseline.className = 'mode-btn';
+        btnModeOptimized.className = 'mode-btn active-optimal';
+        telemetryTemp.textContent = '1,240 °C';
+        telemetryVisc.textContent = '0.28 Pa·s';
+        telemetrySettling.textContent = '45 min';
+        telemetryAg.textContent = '22.8 ppm';
+        telemetryAg.className = 'telemetry-val alert-green';
+      });
+
+      function drawFurnaceArchitecture() {
+        // Platform
+        ctx.fillStyle = '#E2DDD4';
+        ctx.fillRect(80, 465, 1040, 40);
+        ctx.fillStyle = '#CBD5E1';
+        ctx.fillRect(80, 465, 1040, 4);
+
+        // Steel Outer Shell
+        ctx.fillStyle = '#1E293B';
+        ctx.beginPath();
+        ctx.roundRect(310, 75, 380, 380, [14, 14, 6, 6]);
+        ctx.fill();
+
+        // Water jacket cooling channels
+        ctx.fillStyle = '#0284C7';
+        for (let y = 90; y < 440; y += 28) {
+          ctx.fillRect(296, y, 10, 16);
+          ctx.fillRect(694, y, 10, 16);
+        }
+
+        // Refractory Lining
+        ctx.fillStyle = '#9A3412';
+        ctx.beginPath();
+        ctx.roundRect(330, 90, 340, 350, [10, 10, 6, 6]);
+        ctx.fill();
+
+        // Brick Joint Lines
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.lineWidth = 1;
+        for (let y = 105; y < 435; y += 20) {
+          ctx.beginPath();
+          ctx.moveTo(330, y);
+          ctx.lineTo(670, y);
+          ctx.stroke();
+        }
+
+        // Inner Reaction Chamber
+        ctx.fillStyle = '#0F172A';
+        ctx.beginPath();
+        ctx.roundRect(350, 105, 300, 320, [8, 8, 4, 4]);
+        ctx.fill();
+
+        // Molten Bullion Collector Pool (Bottom, Density ~9.0)
+        const bullionGrad = ctx.createLinearGradient(350, 370, 350, 425);
+        bullionGrad.addColorStop(0, '#F59E0B');
+        bullionGrad.addColorStop(1, '#B45309');
+        ctx.fillStyle = bullionGrad;
+        ctx.fillRect(350, 370, 300, 55);
+
+        // Slag Layer (Density ~3.5)
+        const slagGrad = ctx.createLinearGradient(350, 290, 350, 370);
+        if (simMode === 'baseline') {
+          slagGrad.addColorStop(0, '#475569');
+          slagGrad.addColorStop(1, '#334155');
+        } else {
+          slagGrad.addColorStop(0, '#1E3A8A');
+          slagGrad.addColorStop(1, '#1E293B');
+        }
+        ctx.fillStyle = slagGrad;
+        ctx.fillRect(350, 290, 300, 80);
+
+        // Slag/Bullion Boundary
+        ctx.strokeStyle = '#FDE68A';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(350, 370);
+        ctx.lineTo(650, 370);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Offgas Uptake Hood
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(450, 20, 100, 60);
+        ctx.fillStyle = '#1E293B';
+        ctx.fillRect(440, 15, 120, 10);
+      }
+
+      function drawFeedSystem() {
+        ctx.save();
+        ctx.translate(180, 55);
+        ctx.rotate(0.32);
+        ctx.fillStyle = '#64748B';
+        ctx.fillRect(0, 0, 175, 10);
+        ctx.fillStyle = '#1E293B';
+        for (let rx = 10; rx < 165; rx += 28) {
+          ctx.beginPath();
+          ctx.arc(rx, 5, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Feed Hopper
+        ctx.fillStyle = '#475569';
+        ctx.beginPath();
+        ctx.moveTo(360, 40);
+        ctx.lineTo(430, 40);
+        ctx.lineTo(415, 90);
+        ctx.lineTo(375, 90);
+        ctx.closePath();
+        ctx.fill();
+
+        // Pellets Falling
+        if (Math.random() < 0.25) {
+          feedDrops.push({
+            x: 385 + Math.random() * 20,
+            y: 90,
+            vy: 2 + Math.random() * 2.5,
+            size: 2.5 + Math.random() * 2
+          });
+        }
+
+        ctx.fillStyle = '#78350F';
+        feedDrops.forEach((d, idx) => {
+          d.y += d.vy;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+          ctx.fill();
+          if (d.y > 290) feedDrops.splice(idx, 1);
+        });
+      }
+
+      function drawSubmergedTuyeres() {
+        const tuyereY = [325, 355, 390];
+        tuyereY.forEach((ty, i) => {
+          ctx.fillStyle = '#475569';
+          ctx.fillRect(190, ty - 6, 140, 12);
+          ctx.fillStyle = '#0284C7';
+          ctx.fillRect(190, ty - 2, 130, 4);
+
+          // Glowing Nozzle Tip
+          ctx.fillStyle = '#EA580C';
+          ctx.beginPath();
+          ctx.arc(330, ty, 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Blast Jet stream
+          const jetLen = simMode === 'baseline' ? 75 : 45;
+          const jetGrad = ctx.createLinearGradient(330, ty, 330 + jetLen, ty);
+          jetGrad.addColorStop(0, 'rgba(245, 158, 11, 0.95)');
+          jetGrad.addColorStop(0.6, 'rgba(239, 68, 68, 0.65)');
+          jetGrad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+          ctx.fillStyle = jetGrad;
+          ctx.beginPath();
+          ctx.ellipse(330 + jetLen / 2, ty, jetLen / 2, 7 + Math.sin(time * 6 + i) * 3, 0, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Air Manifold Box
+        ctx.fillStyle = '#0369A1';
+        ctx.roundRect(130, 305, 60, 105, 6);
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 9px Inter, sans-serif';
+        ctx.save();
+        ctx.translate(165, 375);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('AIR / O₂ BLAST', 0, 0);
+        ctx.restore();
+      }
+
+      function drawConvectionEddies() {
+        ctx.lineWidth = 1.2;
+        convectionStreams.forEach(s => {
+          if (simMode === 'baseline') {
+            s.angle += 0.05 * s.speed;
+            const cx = s.x + Math.cos(s.angle) * s.radius;
+            const cy = s.y + Math.sin(s.angle) * (s.radius * 0.4);
+            ctx.strokeStyle = 'rgba(245, 158, 11, 0.25)';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
+            ctx.stroke();
+          } else {
+            s.y += 0.3 * s.speed;
+            if (s.y > 365) s.y = 295;
+            ctx.strokeStyle = 'rgba(52, 211, 153, 0.2)';
+            ctx.beginPath();
+            ctx.moveTo(s.x, s.y);
+            ctx.lineTo(s.x, s.y + 6);
+            ctx.stroke();
+          }
+        });
+      }
+
+      function drawSlagTappingStream() {
+        ctx.fillStyle = '#0F172A';
+        ctx.beginPath();
+        ctx.ellipse(690, 340, 14, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Launder Runner Trough
+        ctx.fillStyle = '#334155';
+        ctx.beginPath();
+        ctx.moveTo(690, 335);
+        ctx.lineTo(850, 375);
+        ctx.lineTo(850, 395);
+        ctx.lineTo(690, 355);
+        ctx.closePath();
+        ctx.fill();
+
+        // Molten Slag Flow Stream
+        const slagFlowGrad = ctx.createLinearGradient(690, 340, 850, 380);
+        slagFlowGrad.addColorStop(0, '#F59E0B');
+        slagFlowGrad.addColorStop(1, '#D97706');
+        ctx.fillStyle = slagFlowGrad;
+        ctx.beginPath();
+        ctx.moveTo(690, 340);
+        ctx.lineTo(845, 380);
+        ctx.lineTo(845, 387);
+        ctx.lineTo(690, 347);
+        ctx.closePath();
+        ctx.fill();
+
+        // Slag Pot
+        ctx.fillStyle = '#1E293B';
+        ctx.beginPath();
+        ctx.moveTo(830, 385);
+        ctx.lineTo(920, 385);
+        ctx.lineTo(905, 465);
+        ctx.lineTo(845, 465);
+        ctx.closePath();
+        ctx.fill();
+
+        // Molten Slag in Pot
+        const potGrad = ctx.createLinearGradient(845, 405, 845, 460);
+        potGrad.addColorStop(0, '#F59E0B');
+        potGrad.addColorStop(1, '#9A3412');
+        ctx.fillStyle = potGrad;
+        ctx.beginPath();
+        ctx.moveTo(840, 405);
+        ctx.lineTo(910, 405);
+        ctx.lineTo(903, 460);
+        ctx.lineTo(847, 460);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawDigitalTwinHUD() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+        ctx.strokeStyle = '#E2DDD4';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(870, 75, 280, 160, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '700 11px Inter, sans-serif';
+        ctx.fillText('PROJECT Ag-X DIGITAL TWIN HUD', 890, 100);
+
+        ctx.font = '500 10px Inter, sans-serif';
+        ctx.fillStyle = '#475569';
+        ctx.fillText('• Thermodynamics: FactSage Mass/Heat Bal.', 890, 124);
+        ctx.fillText('• ML Correction: LightGBM v2.4 (Active)', 890, 142);
+
+        ctx.fillStyle = simMode === 'baseline' ? '#DC2626' : '#059669';
+        ctx.font = '700 12.5px Outfit, sans-serif';
+        ctx.fillText(
+          simMode === 'baseline' ? 'Ag ppm: 192.4 [UNSTABLE DRIFT]' : 'Ag ppm: 22.8 [OPTIMIZED TARGET]',
+          890,
+          172
+        );
+
+        ctx.fillStyle = '#64748B';
+        ctx.font = '500 9.5px Inter, sans-serif';
+        ctx.fillText('Constrained Optimization: Safety Envelopes Locked', 890, 202);
+      }
+
+      function updateParticles() {
+        // Fume Volatilization
+        if (Math.random() < 0.25) {
+          fumeParticles.push({
+            x: 480 + (Math.random() - 0.5) * 40,
+            y: 80,
+            vx: (Math.random() - 0.5) * 0.7,
+            vy: -(1.4 + Math.random() * 1.5),
+            alpha: 0.6,
+            radius: 8 + Math.random() * 8
+          });
+        }
+        fumeParticles.forEach((fp, idx) => {
+          fp.x += fp.vx;
+          fp.y += fp.vy;
+          fp.alpha -= 0.008;
+          fp.radius += 0.15;
+          ctx.fillStyle = `rgba(148, 163, 184, ${Math.max(0, fp.alpha)})`;
+          ctx.beginPath();
+          ctx.arc(fp.x, fp.y, fp.radius, 0, Math.PI * 2);
+          ctx.fill();
+          if (fp.alpha <= 0) fumeParticles.splice(idx, 1);
+        });
+
+        // Silver & Bullion Prills (Settling vs Entrainment)
+        const prillGenRate = simMode === 'baseline' ? 3 : 1;
+        if (Math.random() < 0.35) {
+          for (let i = 0; i < prillGenRate; i++) {
+            slagPrills.push({
+              x: 360 + Math.random() * 280,
+              y: 295 + Math.random() * 60,
+              vy: simMode === 'baseline' ? (Math.random() - 0.45) * 1.1 : 0.9 + Math.random() * 0.8,
+              size: 2 + Math.random() * 2.5
+            });
+          }
+        }
+        slagPrills.forEach((sp, idx) => {
+          sp.y += sp.vy;
+          ctx.fillStyle = simMode === 'baseline' ? '#EF4444' : '#10B981';
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+          ctx.fill();
+          if (sp.y >= 370 || sp.y < 290) slagPrills.splice(idx, 1);
+        });
+      }
+
+      function renderLabels() {
+        const labels = [
+          { text: 'Feed Hopper', x: 395, y: 32 },
+          { text: 'Water-Cooled Shell', x: 250, y: 120 },
+          { text: 'Refractory Lining', x: 250, y: 170 },
+          { text: 'Slag Layer (3.5 g/cm³)', x: 420, y: 330 },
+          { text: 'Bullion Pool (9.0 g/cm³)', x: 420, y: 405 },
+          { text: 'Slag Launder Trough', x: 740, y: 325 },
+          { text: 'Slag Ladle Pot', x: 875, y: 490 }
+        ];
+
+        ctx.font = '600 10px Inter, sans-serif';
+        labels.forEach(lbl => {
+          const tw = ctx.measureText(lbl.text).width + 14;
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+          ctx.strokeStyle = '#CBD5E1';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(lbl.x - tw / 2, lbl.y - 13, tw, 20, 4);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = '#0F172A';
+          ctx.textAlign = 'center';
+          ctx.fillText(lbl.text, lbl.x, lbl.y);
+        });
+        ctx.textAlign = 'start';
+      }
+
+      function animate() {
+        time += 0.02;
+        ctx.clearRect(0, 0, W, H);
+
+        drawFurnaceArchitecture();
+        drawFeedSystem();
+        drawConvectionEddies();
+        drawSubmergedTuyeres();
+        drawSlagTappingStream();
+        updateParticles();
+        drawDigitalTwinHUD();
+        renderLabels();
+
+        requestAnimationFrame(animate);
+      }
+
+      if (!ctx.roundRect) {
+        ctx.roundRect = function(x, y, w, h, radii) {
+          const r = Array.isArray(radii) ? radii : [radii, radii, radii, radii];
+          ctx.beginPath();
+          ctx.moveTo(x + r[0], y);
+          ctx.lineTo(x + w - r[1], y);
+          ctx.arcTo(x + w, y, x + w, y + r[1], r[1]);
+          ctx.lineTo(x + w, y + h - r[2]);
+          ctx.arcTo(x + w, y + h, x + w - r[2], y + h, r[2]);
+          ctx.lineTo(x + r[3], y + h);
+          ctx.arcTo(x, y + h, x, y + h - r[3], r[3]);
+          ctx.lineTo(x, y + r[0]);
+          ctx.arcTo(x, y, x + r[0], y, r[0]);
+          ctx.closePath();
+        };
+      }
+
+      animate();
+    })();
+  </script>
+</body>
+</html>

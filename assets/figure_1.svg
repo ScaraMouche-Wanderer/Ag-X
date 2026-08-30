@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 820" width="1440" height="820" style="background:#ffffff; font-family:'Segoe UI', Inter, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+  <defs>
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+    <marker id="arrowNavy" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#1E3A8A"/>
+    </marker>
+    <marker id="arrowTeal" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#0F766E"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="4" refY="2" orient="auto">
+      <path d="M1,1 L4,2 L1,3 Z" fill="#0D9488"/>
+    </marker>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="720" y="46" font-size="26" font-weight="800" fill="#0F172A" text-anchor="middle" letter-spacing="-0.5">Project Ag-X — Strategic Roadmap</text>
+  <text x="720" y="74" font-size="14.5" font-style="italic" font-weight="500" fill="#475569" text-anchor="middle">From root-cause diagnosis (192 ppm) to sustained control at target (≤25 ppm)</text>
+
+  <!-- ==================== TRACK A ==================== -->
+  <!-- Track A Banner -->
+  <rect x="50" y="105" width="1340" height="40" rx="6" fill="#1E3A8A"/>
+  <text x="720" y="130" font-size="13.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.8">TRACK A — METALLURGICAL / OPERATIONAL FIX  <tspan font-weight="400" fill="#93C5FD">(drives the 192 → 25 ppm gap)</tspan></text>
+
+  <!-- Track A Phase Cards -->
+  <!-- Card 1 -->
+  <g transform="translate(50, 160)">
+    <rect width="295" height="155" rx="10" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#EFF6FF"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle" letter-spacing="0.5">PHASE 1</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Root-Cause Diagnosis</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Slag SEM / EDS analysis</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Entrainment vs. dissolution split</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#B45309" text-anchor="middle">Duration: 1–2 wks</text>
+  </g>
+
+  <!-- Arrow 1 -> 2 -->
+  <line x1="355" y1="237" x2="388" y2="237" stroke="#1E3A8A" stroke-width="2.5" marker-end="url(#arrowNavy)"/>
+
+  <!-- Card 2 -->
+  <g transform="translate(398, 160)">
+    <rect width="295" height="155" rx="10" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#EFF6FF"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle" letter-spacing="0.5">PHASE 2</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Quick-Win Trials</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Settling time &amp; reductant dosing</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Basicity &amp; tapping practice review</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#B45309" text-anchor="middle">Duration: 4–8 wks</text>
+  </g>
+
+  <!-- Arrow 2 -> 3 -->
+  <line x1="703" y1="237" x2="736" y2="237" stroke="#1E3A8A" stroke-width="2.5" marker-end="url(#arrowNavy)"/>
+
+  <!-- Card 3 -->
+  <g transform="translate(746, 160)">
+    <rect width="295" height="155" rx="10" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#EFF6FF"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle" letter-spacing="0.5">PHASE 3</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Process / Design Fix</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Slag settling / cleaning stage</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Launder redesign &amp; feed blending</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#B45309" text-anchor="middle">Duration: 3–6 mo</text>
+  </g>
+
+  <!-- Arrow 3 -> 4 -->
+  <line x1="1051" y1="237" x2="1084" y2="237" stroke="#1E3A8A" stroke-width="2.5" marker-end="url(#arrowNavy)"/>
+
+  <!-- Card 4 -->
+  <g transform="translate(1095, 160)">
+    <rect width="295" height="155" rx="10" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#EFF6FF"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#1E3A8A" text-anchor="middle" letter-spacing="0.5">PHASE 4</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Stabilize &amp; Hold Target</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">SOPs &amp; statistical control limits</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Operator training · ≤25 ppm sustained</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#059669" text-anchor="middle">Status: Ongoing</text>
+  </g>
+
+  <!-- ==================== VERTICAL LINK ==================== -->
+  <path d="M 197 325 L 197 410" fill="none" stroke="#0D9488" stroke-width="2" stroke-dasharray="4,4"/>
+  <polygon points="197,416 193,408 201,408" fill="#0D9488"/>
+  <text x="215" y="372" font-size="12.5" font-style="italic" font-weight="600" fill="#0F766E">feeds data collection from day one</text>
+
+  <!-- ==================== TRACK B ==================== -->
+  <!-- Track B Banner -->
+  <rect x="50" y="425" width="1340" height="40" rx="6" fill="#0F766E"/>
+  <text x="720" y="450" font-size="13.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.8">TRACK B — DATA &amp; DIGITAL TWIN  <tspan font-weight="400" fill="#99F6E4">(holds the gains, prevents drift)</tspan></text>
+
+  <!-- Track B Phase Cards -->
+  <!-- Card 5 -->
+  <g transform="translate(50, 480)">
+    <rect width="295" height="155" rx="10" fill="#F0FDFA" stroke="#0F766E" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#CCFBF1"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#0F766E" text-anchor="middle" letter-spacing="0.5">PHASE 5</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Data Foundation</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Historian (1-min) + LIMS + MES</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Batch-linked production data</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#B45309" text-anchor="middle">Timeline: In parallel from Ph.1</text>
+  </g>
+
+  <!-- Arrow 5 -> 6 -->
+  <line x1="355" y1="557" x2="388" y2="557" stroke="#0F766E" stroke-width="2.5" marker-end="url(#arrowTeal)"/>
+
+  <!-- Card 6 -->
+  <g transform="translate(398, 480)">
+    <rect width="295" height="155" rx="10" fill="#F0FDFA" stroke="#0F766E" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#CCFBF1"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#0F766E" text-anchor="middle" letter-spacing="0.5">PHASE 6</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Predictive ML Model</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Real-time process state estimation</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Ag ppm forecast ahead of lab assay</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#B45309" text-anchor="middle">Timeline: After Ph.2</text>
+  </g>
+
+  <!-- Arrow 6 -> 7 -->
+  <line x1="703" y1="557" x2="736" y2="557" stroke="#0F766E" stroke-width="2.5" marker-end="url(#arrowTeal)"/>
+
+  <!-- Card 7 -->
+  <g transform="translate(746, 480)">
+    <rect width="295" height="155" rx="10" fill="#F0FDFA" stroke="#0F766E" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#CCFBF1"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#0F766E" text-anchor="middle" letter-spacing="0.5">PHASE 7</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Physics + ML Digital Twin</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Mass / heat balance + thermodynamics</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">ML correction + optimizer engine</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#B45309" text-anchor="middle">Timeline: After Ph.3</text>
+  </g>
+
+  <!-- Arrow 7 -> 8 -->
+  <line x1="1051" y1="557" x2="1084" y2="557" stroke="#0F766E" stroke-width="2.5" marker-end="url(#arrowTeal)"/>
+
+  <!-- Card 8 -->
+  <g transform="translate(1095, 480)">
+    <rect width="295" height="155" rx="10" fill="#F0FDFA" stroke="#0F766E" stroke-width="2" filter="url(#cardShadow)"/>
+    <rect x="15" y="14" width="265" height="24" rx="4" fill="#CCFBF1"/>
+    <text x="147" y="30" font-size="12" font-weight="800" fill="#0F766E" text-anchor="middle" letter-spacing="0.5">PHASE 8</text>
+    <text x="147" y="66" font-size="16" font-weight="800" fill="#0F172A" text-anchor="middle">Advisory → Closed-Loop</text>
+    <text x="147" y="94" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Operator advisory setpoints</text>
+    <text x="147" y="114" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Then DCS / PLC auto-execution</text>
+    <text x="147" y="140" font-size="11.5" font-weight="700" fill="#047857" text-anchor="middle">Timeline: Long-term</text>
+  </g>
+
+  <!-- ==================== TARGET GATE BANNER ==================== -->
+  <g transform="translate(220, 675)">
+    <rect width="1000" height="46" rx="23" fill="#FEF3C7" stroke="#D97706" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <text x="500" y="29" font-size="13.5" font-weight="700" fill="#92400E" text-anchor="middle" letter-spacing="0.2">
+      Target gate: Ag in slag ≤ 25 ppm sustained across ≥ 90% of batches, before advancing to closed-loop control
+    </text>
+  </g>
+</svg>

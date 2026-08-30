@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1150" width="1000" height="1150" style="background:#ffffff; font-family:'Segoe UI', Inter, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;">
+  <defs>
+    <filter id="shadowBox" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrowDown" markerWidth="8" markerHeight="8" refX="4" refY="6" orient="auto">
+      <path d="M1,2 L4,6 L7,2 Z" fill="#475569"/>
+    </marker>
+    <marker id="arrowUp" markerWidth="8" markerHeight="8" refX="4" refY="2" orient="auto">
+      <path d="M1,6 L4,2 L7,6 Z" fill="#0F766E"/>
+    </marker>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="500" y="44" font-size="24" font-weight="800" fill="#0F172A" text-anchor="middle" letter-spacing="-0.5">Project Ag-X: Digital Twin Architecture</text>
+  <text x="500" y="70" font-size="13.5" font-style="italic" font-weight="500" fill="#475569" text-anchor="middle">Physics model + ML correction, closing the loop from feed to operator recommendation</text>
+
+  <!-- Left Feedback Loop Line -->
+  <path d="M 65 1040 L 45 1040 L 45 225 L 75 225" fill="none" stroke="#0F766E" stroke-width="2" stroke-dasharray="5,4"/>
+  <polygon points="75,225 65,220 65,230" fill="#0F766E"/>
+  <text transform="translate(32, 630) rotate(-90)" font-size="11.5" font-style="italic" font-weight="600" fill="#0F766E" text-anchor="middle">
+    Lab assay verification feeds back → continuous model retraining &amp; bias calibration
+  </text>
+
+  <!-- ==================== BOX 1: PLANT OPERATION ==================== -->
+  <g transform="translate(80, 95)">
+    <rect width="840" height="90" rx="8" fill="#1E3A8A" filter="url(#shadowBox)"/>
+    <text x="30" y="32" font-size="14.5" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">1 — PLANT FURNACE OPERATION &amp; FEED</text>
+    <text x="45" y="58" font-size="12.5" font-weight="500" fill="#DBEAFE">• Feed Assay: Ag, Pb, Cu, Fe, Zn, S, SiO₂, CaO, Al₂O₃, moisture</text>
+    <text x="45" y="77" font-size="12.5" font-weight="500" fill="#DBEAFE">• Operating Setpoints: Temperature, pressure, blast air / O₂, flux dosing, reductant</text>
+  </g>
+
+  <!-- Down Arrow 1 -> 2 -->
+  <line x1="500" y1="185" x2="500" y2="210" stroke="#475569" stroke-width="2.5" marker-end="url(#arrowDown)"/>
+
+  <!-- ==================== BOX 2: DATA PLATFORM ==================== -->
+  <g transform="translate(80, 215)">
+    <rect width="840" height="75" rx="8" fill="#2563EB" filter="url(#shadowBox)"/>
+    <text x="30" y="30" font-size="14.5" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">2 — DATA PLATFORM</text>
+    <text x="45" y="56" font-size="12.5" font-weight="500" fill="#EFF6FF">• OSIsoft PI Historian (1-min tags) + LIMS lab results + MES batch records</text>
+  </g>
+
+  <!-- Down Arrow 2 -> 3 -->
+  <line x1="500" y1="290" x2="500" y2="315" stroke="#475569" stroke-width="2.5" marker-end="url(#arrowDown)"/>
+
+  <!-- ==================== BOX 3: DIGITAL TWIN CORE ==================== -->
+  <g transform="translate(80, 320)">
+    <!-- Container Card -->
+    <rect width="840" height="235" rx="10" fill="#F8FAFC" stroke="#1E3A8A" stroke-width="2" filter="url(#shadowBox)"/>
+    <text x="420" y="28" font-size="15" font-weight="800" fill="#0F172A" text-anchor="middle" letter-spacing="0.5">3 — DIGITAL TWIN CORE (HYBRID MODEL)</text>
+    
+    <!-- Physics Sub-Card -->
+    <g transform="translate(20, 42)">
+      <rect width="385" height="175" rx="8" fill="#EFF6FF" stroke="#3B82F6" stroke-width="1.5"/>
+      <text x="192" y="26" font-size="13" font-weight="800" fill="#1E3A8A" text-anchor="middle" letter-spacing="0.5">PHYSICS LAYER</text>
+      <text x="25" y="56" font-size="12" font-weight="600" fill="#1E293B">• Mass &amp; heat balances</text>
+      <text x="25" y="82" font-size="12" font-weight="600" fill="#1E293B">• Slag thermodynamics &amp; redox (FactSage)</text>
+      <text x="25" y="108" font-size="12" font-weight="600" fill="#1E293B">• Liquidus &amp; viscosity relations</text>
+      <text x="25" y="134" font-size="12" font-weight="600" fill="#1E293B">• Fuming reaction kinetics &amp; settling rate</text>
+    </g>
+
+    <!-- Center Plus -->
+    <circle cx="420" cy="130" r="16" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <text x="420" y="137" font-size="20" font-weight="800" fill="#0F766E" text-anchor="middle">+</text>
+
+    <!-- ML Sub-Card -->
+    <g transform="translate(435, 42)">
+      <rect width="385" height="175" rx="8" fill="#F0FDFA" stroke="#0D9488" stroke-width="1.5"/>
+      <text x="192" y="26" font-size="13" font-weight="800" fill="#0F766E" text-anchor="middle" letter-spacing="0.5">ML CORRECTION LAYER</text>
+      <text x="25" y="56" font-size="12" font-weight="600" fill="#1E293B">• Learns furnace-specific operational bias</text>
+      <text x="25" y="82" font-size="12" font-weight="600" fill="#1E293B">• Captures feed variability &amp; moisture effects</text>
+      <text x="25" y="108" font-size="12" font-weight="600" fill="#1E293B">• Adjusts for refractory wear &amp; campaign drift</text>
+      <text x="25" y="134" font-size="12" font-weight="600" fill="#1E293B">• Compensates for unmeasured disturbances</text>
+    </g>
+  </g>
+
+  <!-- Down Arrow 3 -> 4 -->
+  <line x1="500" y1="555" x2="500" y2="585" stroke="#475569" stroke-width="2.5" marker-end="url(#arrowDown)"/>
+
+  <!-- ==================== BOX 4: CONSTRAINED OPTIMIZATION ENGINE ==================== -->
+  <g transform="translate(80, 590)">
+    <rect width="840" height="110" rx="8" fill="#581C87" filter="url(#shadowBox)"/>
+    <text x="30" y="30" font-size="14.5" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">4 — CONSTRAINED OPTIMIZATION ENGINE</text>
+    <text x="45" y="58" font-size="12.5" font-weight="600" fill="#F3E8FF">• Objective: Minimize Ag loss + λ₁·Energy + λ₂·Flux consumption + λ₃·Fume loss</text>
+    <text x="45" y="82" font-size="12.5" font-weight="500" fill="#E9D5FF">• Hard Constraints: Temperature &amp; pressure OEM limits, basicity (CaO/SiO₂), FeO redox window</text>
+  </g>
+
+  <!-- Down Arrow 4 -> 5 -->
+  <line x1="500" y1="700" x2="500" y2="730" stroke="#475569" stroke-width="2.5" marker-end="url(#arrowDown)"/>
+
+  <!-- ==================== BOX 5: RECOMMENDED SETPOINTS & EXPLAINABILITY ==================== -->
+  <g transform="translate(80, 735)">
+    <rect width="840" height="115" rx="8" fill="#B45309" filter="url(#shadowBox)"/>
+    <text x="30" y="30" font-size="14.5" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">5 — RECOMMENDED SETPOINTS + EXPLAINABILITY</text>
+    <text x="45" y="58" font-size="12.5" font-weight="600" fill="#FEF3C7">• Actionable Recommendations: T, pressure, blast air / O₂, flux dosing, reductant, hold / settling time</text>
+    <text x="45" y="82" font-size="12.5" font-weight="500" fill="#FDE68A">• Explainable Drivers: Quantified attribution (basicity shift, settling gain, slag viscosity reduction)</text>
+  </g>
+
+  <!-- Down Arrow 5 -> 6 -->
+  <line x1="500" y1="850" x2="500" y2="880" stroke="#475569" stroke-width="2.5" marker-end="url(#arrowDown)"/>
+
+  <!-- ==================== BOX 6: OPERATOR ADVISORY -> DCS/PLC ==================== -->
+  <g transform="translate(80, 885)">
+    <rect width="840" height="110" rx="8" fill="#1E293B" filter="url(#shadowBox)"/>
+    <text x="30" y="30" font-size="14.5" font-weight="800" fill="#FFFFFF" letter-spacing="0.5">6 — OPERATOR ADVISORY → DCS / PLC (CLOSED LOOP)</text>
+    <text x="45" y="58" font-size="12.5" font-weight="600" fill="#E2E8F0">• Phase 1 (Advisory): Metallurgist &amp; operator review setpoints before approving implementation</text>
+    <text x="45" y="82" font-size="12.5" font-weight="500" fill="#94A3B8">• Phase 2 (Closed-Loop): Automatic setpoint transmission to DCS / PLC after extended validation</text>
+  </g>
+
+  <!-- Bottom Subtitle / Compliance -->
+  <text x="500" y="1030" font-size="12.5" font-weight="600" fill="#047857" text-anchor="middle">
+    ✔ Continuous validation ensures Ag in slag ≤ 25 ppm while maintaining full thermal and equipment safety
+  </text>
+</svg>

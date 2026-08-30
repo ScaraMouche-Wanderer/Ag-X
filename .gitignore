@@ -1,0 +1,4 @@
+.system_generated/
+__pycache__/
+*.pyc
+.DS_Store

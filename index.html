@@ -958,38 +958,45 @@
     calculateROI();
 
     /* ============================================================
-       6. Interactive Furnace Simulator Canvas (Seamless Animation)
+       6. Interactive Furnace Simulator Canvas (60 FPS High-Tech Digital Twin)
        ============================================================ */
     (function() {
       const canvas = document.getElementById('fumerInteractiveCanvas');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
 
-      const dpr = window.devicePixelRatio || 1;
       const W = 1200;
       const H = 520;
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
-      ctx.scale(dpr, dpr);
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+      function initCanvasSize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+      }
+      initCanvasSize();
+
+      // State & Smooth Interpolation (LERP)
       let simMode = 'baseline';
+      let targetProgress = 0; // 0 = baseline, 1 = optimized
+      let transitionProgress = 0;
       let time = 0;
 
-      let sparks = [];
-      let slagPrills = [];
-      let fumeParticles = [];
-      let feedDrops = [];
-      let convectionStreams = [];
+      // Telemetry Values (Interpolated)
+      let currentAg = 192.4;
+      let currentVisc = 0.52;
+      let currentSettling = 10;
+      let currentTemp = 1280;
 
-      for (let i = 0; i < 18; i++) {
-        convectionStreams.push({
-          x: 370 + Math.random() * 260,
-          y: 310 + Math.random() * 70,
-          angle: Math.random() * Math.PI * 2,
-          speed: 0.6 + Math.random() * 0.8,
-          radius: 15 + Math.random() * 25
-        });
-      }
+      // Real-time Sparkline History (70 points)
+      const historyLength = 70;
+      const agHistory = new Array(historyLength).fill(192.4);
+
+      // Mouse Hover Detection
+      let mouseX = -1000;
+      let mouseY = -1000;
+      let activeHoverComponent = null;
 
       const btnModeBaseline = document.getElementById('btnModeBaseline');
       const btnModeOptimized = document.getElementById('btnModeOptimized');
@@ -998,388 +1005,91 @@
       const telemetrySettling = document.getElementById('telemetrySettling');
       const telemetryAg = document.getElementById('telemetryAg');
 
-      btnModeBaseline.addEventListener('click', () => {
-        simMode = 'baseline';
-        btnModeBaseline.className = 'mode-btn active';
-        btnModeOptimized.className = 'mode-btn lure-pulse';
-        telemetryTemp.textContent = '1,280 °C';
-        telemetryVisc.textContent = '0.52 Pa·s';
-        telemetrySettling.textContent = '10 min';
-        telemetryAg.textContent = '192.4 ppm';
-        telemetryAg.className = 'telemetry-val alert-red';
-      });
-
-      btnModeOptimized.addEventListener('click', () => {
-        simMode = 'optimized';
-        btnModeBaseline.className = 'mode-btn';
-        btnModeOptimized.className = 'mode-btn active-optimal';
-        telemetryTemp.textContent = '1,240 °C';
-        telemetryVisc.textContent = '0.28 Pa·s';
-        telemetrySettling.textContent = '45 min';
-        telemetryAg.textContent = '22.8 ppm';
-        telemetryAg.className = 'telemetry-val alert-green';
-      });
-
-      function drawFurnaceArchitecture() {
-        // Platform
-        ctx.fillStyle = '#E2DDD4';
-        ctx.fillRect(80, 465, 1040, 40);
-        ctx.fillStyle = '#CBD5E1';
-        ctx.fillRect(80, 465, 1040, 4);
-
-        // Steel Outer Shell
-        ctx.fillStyle = '#1E293B';
-        ctx.beginPath();
-        ctx.roundRect(310, 75, 380, 380, [14, 14, 6, 6]);
-        ctx.fill();
-
-        // Water jacket cooling channels
-        ctx.fillStyle = '#0284C7';
-        for (let y = 90; y < 440; y += 28) {
-          ctx.fillRect(296, y, 10, 16);
-          ctx.fillRect(694, y, 10, 16);
-        }
-
-        // Refractory Lining
-        ctx.fillStyle = '#9A3412';
-        ctx.beginPath();
-        ctx.roundRect(330, 90, 340, 350, [10, 10, 6, 6]);
-        ctx.fill();
-
-        // Brick Joint Lines
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-        ctx.lineWidth = 1;
-        for (let y = 105; y < 435; y += 20) {
-          ctx.beginPath();
-          ctx.moveTo(330, y);
-          ctx.lineTo(670, y);
-          ctx.stroke();
-        }
-
-        // Inner Reaction Chamber
-        ctx.fillStyle = '#0F172A';
-        ctx.beginPath();
-        ctx.roundRect(350, 105, 300, 320, [8, 8, 4, 4]);
-        ctx.fill();
-
-        // Molten Bullion Collector Pool (Bottom, Density ~9.0)
-        const bullionGrad = ctx.createLinearGradient(350, 370, 350, 425);
-        bullionGrad.addColorStop(0, '#F59E0B');
-        bullionGrad.addColorStop(1, '#B45309');
-        ctx.fillStyle = bullionGrad;
-        ctx.fillRect(350, 370, 300, 55);
-
-        // Slag Layer (Density ~3.5)
-        const slagGrad = ctx.createLinearGradient(350, 290, 350, 370);
-        if (simMode === 'baseline') {
-          slagGrad.addColorStop(0, '#475569');
-          slagGrad.addColorStop(1, '#334155');
+      function setMode(mode) {
+        simMode = mode;
+        if (mode === 'baseline') {
+          targetProgress = 0;
+          btnModeBaseline.className = 'mode-btn active';
+          btnModeOptimized.className = 'mode-btn lure-pulse';
         } else {
-          slagGrad.addColorStop(0, '#1E3A8A');
-          slagGrad.addColorStop(1, '#1E293B');
+          targetProgress = 1;
+          btnModeBaseline.className = 'mode-btn';
+          btnModeOptimized.className = 'mode-btn active-optimal';
         }
-        ctx.fillStyle = slagGrad;
-        ctx.fillRect(350, 290, 300, 80);
-
-        // Slag/Bullion Boundary
-        ctx.strokeStyle = '#FDE68A';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(350, 370);
-        ctx.lineTo(650, 370);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Offgas Uptake Hood
-        ctx.fillStyle = '#334155';
-        ctx.fillRect(450, 20, 100, 60);
-        ctx.fillStyle = '#1E293B';
-        ctx.fillRect(440, 15, 120, 10);
       }
 
-      function drawFeedSystem() {
-        ctx.save();
-        ctx.translate(180, 55);
-        ctx.rotate(0.32);
-        ctx.fillStyle = '#64748B';
-        ctx.fillRect(0, 0, 175, 10);
-        ctx.fillStyle = '#1E293B';
-        for (let rx = 10; rx < 165; rx += 28) {
-          ctx.beginPath();
-          ctx.arc(rx, 5, 5, 0, Math.PI * 2);
-          ctx.fill();
+      btnModeBaseline.addEventListener('click', () => setMode('baseline'));
+      btnModeOptimized.addEventListener('click', () => setMode('optimized'));
+
+      // Mouse Interaction Listeners
+      canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = (e.clientX - rect.left) * (W / rect.width);
+        mouseY = (e.clientY - rect.top) * (H / rect.height);
+      });
+
+      canvas.addEventListener('mouseleave', () => {
+        mouseX = -1000;
+        mouseY = -1000;
+        activeHoverComponent = null;
+      });
+
+      // Interactive Click on Canvas components to inspect or toggle
+      canvas.addEventListener('click', () => {
+        if (mouseX >= 870 && mouseX <= 1175 && mouseY >= 50 && mouseY <= 260) {
+          setMode(simMode === 'baseline' ? 'optimized' : 'baseline');
         }
-        ctx.restore();
+      });
 
-        // Feed Hopper
-        ctx.fillStyle = '#475569';
-        ctx.beginPath();
-        ctx.moveTo(360, 40);
-        ctx.lineTo(430, 40);
-        ctx.lineTo(415, 90);
-        ctx.lineTo(375, 90);
-        ctx.closePath();
-        ctx.fill();
+      // ============================================================
+      // PARTICLE POOLS & SIMULATION AGENTS
+      // ============================================================
 
-        // Pellets Falling
-        if (Math.random() < 0.25) {
-          feedDrops.push({
-            x: 385 + Math.random() * 20,
-            y: 90,
-            vy: 2 + Math.random() * 2.5,
-            size: 2.5 + Math.random() * 2
-          });
-        }
-
-        ctx.fillStyle = '#78350F';
-        feedDrops.forEach((d, idx) => {
-          d.y += d.vy;
-          ctx.beginPath();
-          ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-          ctx.fill();
-          if (d.y > 290) feedDrops.splice(idx, 1);
+      // 1. Silver Bullion Prills (Physical Settling vs Entrainment)
+      const NUM_PRILLS = 52;
+      const slagPrills = [];
+      for (let i = 0; i < NUM_PRILLS; i++) {
+        slagPrills.push({
+          x: 355 + Math.random() * 290,
+          y: 282 + Math.random() * 85,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: 0.2 + Math.random() * 0.5,
+          radius: 1.8 + Math.random() * 2.6,
+          mass: 0.8 + Math.random() * 0.7,
+          shine: Math.random() * Math.PI * 2,
+          isEntrained: false,
+          trail: []
         });
       }
 
-      function drawSubmergedTuyeres() {
-        const tuyereY = [325, 355, 390];
-        tuyereY.forEach((ty, i) => {
-          ctx.fillStyle = '#475569';
-          ctx.fillRect(190, ty - 6, 140, 12);
-          ctx.fillStyle = '#0284C7';
-          ctx.fillRect(190, ty - 2, 130, 4);
+      // 2. Settling Ripple Absorptions in Bullion Pool
+      const settlingRipples = [];
 
-          // Glowing Nozzle Tip
-          ctx.fillStyle = '#EA580C';
-          ctx.beginPath();
-          ctx.arc(330, ty, 7, 0, Math.PI * 2);
-          ctx.fill();
+      // 3. Feed Pellets & Melting Impacts
+      const feedPellets = [];
+      const meltSparks = [];
 
-          // Blast Jet stream
-          const jetLen = simMode === 'baseline' ? 75 : 45;
-          const jetGrad = ctx.createLinearGradient(330, ty, 330 + jetLen, ty);
-          jetGrad.addColorStop(0, 'rgba(245, 158, 11, 0.95)');
-          jetGrad.addColorStop(0.6, 'rgba(239, 68, 68, 0.65)');
-          jetGrad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+      // 4. Tuyere Gas Cavity Bubbles & Flames
+      const tuyereBubbles = [];
 
-          ctx.fillStyle = jetGrad;
-          ctx.beginPath();
-          ctx.ellipse(330 + jetLen / 2, ty, jetLen / 2, 7 + Math.sin(time * 6 + i) * 3, 0, 0, Math.PI * 2);
-          ctx.fill();
-        });
+      // 5. Volatile Offgas Fumes
+      const fumeParticles = [];
 
-        // Air Manifold Box
-        ctx.fillStyle = '#0369A1';
-        ctx.roundRect(130, 305, 60, 105, 6);
-        ctx.fill();
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '700 9px Inter, sans-serif';
-        ctx.save();
-        ctx.translate(165, 375);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillText('AIR / O₂ BLAST', 0, 0);
-        ctx.restore();
-      }
-
-      function drawConvectionEddies() {
-        ctx.lineWidth = 1.2;
-        convectionStreams.forEach(s => {
-          if (simMode === 'baseline') {
-            s.angle += 0.05 * s.speed;
-            const cx = s.x + Math.cos(s.angle) * s.radius;
-            const cy = s.y + Math.sin(s.angle) * (s.radius * 0.4);
-            ctx.strokeStyle = 'rgba(245, 158, 11, 0.25)';
-            ctx.beginPath();
-            ctx.arc(cx, cy, 2.5, 0, Math.PI * 2);
-            ctx.stroke();
-          } else {
-            s.y += 0.3 * s.speed;
-            if (s.y > 365) s.y = 295;
-            ctx.strokeStyle = 'rgba(52, 211, 153, 0.2)';
-            ctx.beginPath();
-            ctx.moveTo(s.x, s.y);
-            ctx.lineTo(s.x, s.y + 6);
-            ctx.stroke();
-          }
+      // 6. Water Cooling Flow Pulses
+      const coolantPulses = [];
+      for (let i = 0; i < 14; i++) {
+        coolantPulses.push({
+          y: 90 + Math.random() * 340,
+          side: i % 2 === 0 ? 'left' : 'right',
+          speed: 1.2 + Math.random() * 0.8,
+          phase: Math.random() * Math.PI * 2
         });
       }
 
-      function drawSlagTappingStream() {
-        ctx.fillStyle = '#0F172A';
-        ctx.beginPath();
-        ctx.ellipse(690, 340, 14, 10, 0, 0, Math.PI * 2);
-        ctx.fill();
+      // 7. Launder Pouring Slag Stream & Loss Sparks
+      const launderSparks = [];
 
-        // Launder Runner Trough
-        ctx.fillStyle = '#334155';
-        ctx.beginPath();
-        ctx.moveTo(690, 335);
-        ctx.lineTo(850, 375);
-        ctx.lineTo(850, 395);
-        ctx.lineTo(690, 355);
-        ctx.closePath();
-        ctx.fill();
-
-        // Molten Slag Flow Stream
-        const slagFlowGrad = ctx.createLinearGradient(690, 340, 850, 380);
-        slagFlowGrad.addColorStop(0, '#F59E0B');
-        slagFlowGrad.addColorStop(1, '#D97706');
-        ctx.fillStyle = slagFlowGrad;
-        ctx.beginPath();
-        ctx.moveTo(690, 340);
-        ctx.lineTo(845, 380);
-        ctx.lineTo(845, 387);
-        ctx.lineTo(690, 347);
-        ctx.closePath();
-        ctx.fill();
-
-        // Slag Pot
-        ctx.fillStyle = '#1E293B';
-        ctx.beginPath();
-        ctx.moveTo(830, 385);
-        ctx.lineTo(920, 385);
-        ctx.lineTo(905, 465);
-        ctx.lineTo(845, 465);
-        ctx.closePath();
-        ctx.fill();
-
-        // Molten Slag in Pot
-        const potGrad = ctx.createLinearGradient(845, 405, 845, 460);
-        potGrad.addColorStop(0, '#F59E0B');
-        potGrad.addColorStop(1, '#9A3412');
-        ctx.fillStyle = potGrad;
-        ctx.beginPath();
-        ctx.moveTo(840, 405);
-        ctx.lineTo(910, 405);
-        ctx.lineTo(903, 460);
-        ctx.lineTo(847, 460);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      function drawDigitalTwinHUD() {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
-        ctx.strokeStyle = '#E2DDD4';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.roundRect(870, 75, 280, 160, 10);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#0F172A';
-        ctx.font = '700 11px Inter, sans-serif';
-        ctx.fillText('PROJECT Ag-X DIGITAL TWIN HUD', 890, 100);
-
-        ctx.font = '500 10px Inter, sans-serif';
-        ctx.fillStyle = '#475569';
-        ctx.fillText('• Thermodynamics: FactSage Mass/Heat Bal.', 890, 124);
-        ctx.fillText('• ML Correction: LightGBM v2.4 (Active)', 890, 142);
-
-        ctx.fillStyle = simMode === 'baseline' ? '#DC2626' : '#059669';
-        ctx.font = '700 12.5px Outfit, sans-serif';
-        ctx.fillText(
-          simMode === 'baseline' ? 'Ag ppm: 192.4 [UNSTABLE DRIFT]' : 'Ag ppm: 22.8 [OPTIMIZED TARGET]',
-          890,
-          172
-        );
-
-        ctx.fillStyle = '#64748B';
-        ctx.font = '500 9.5px Inter, sans-serif';
-        ctx.fillText('Constrained Optimization: Safety Envelopes Locked', 890, 202);
-      }
-
-      function updateParticles() {
-        // Fume Volatilization
-        if (Math.random() < 0.25) {
-          fumeParticles.push({
-            x: 480 + (Math.random() - 0.5) * 40,
-            y: 80,
-            vx: (Math.random() - 0.5) * 0.7,
-            vy: -(1.4 + Math.random() * 1.5),
-            alpha: 0.6,
-            radius: 8 + Math.random() * 8
-          });
-        }
-        fumeParticles.forEach((fp, idx) => {
-          fp.x += fp.vx;
-          fp.y += fp.vy;
-          fp.alpha -= 0.008;
-          fp.radius += 0.15;
-          ctx.fillStyle = `rgba(148, 163, 184, ${Math.max(0, fp.alpha)})`;
-          ctx.beginPath();
-          ctx.arc(fp.x, fp.y, fp.radius, 0, Math.PI * 2);
-          ctx.fill();
-          if (fp.alpha <= 0) fumeParticles.splice(idx, 1);
-        });
-
-        // Silver & Bullion Prills (Settling vs Entrainment)
-        const prillGenRate = simMode === 'baseline' ? 3 : 1;
-        if (Math.random() < 0.35) {
-          for (let i = 0; i < prillGenRate; i++) {
-            slagPrills.push({
-              x: 360 + Math.random() * 280,
-              y: 295 + Math.random() * 60,
-              vy: simMode === 'baseline' ? (Math.random() - 0.45) * 1.1 : 0.9 + Math.random() * 0.8,
-              size: 2 + Math.random() * 2.5
-            });
-          }
-        }
-        slagPrills.forEach((sp, idx) => {
-          sp.y += sp.vy;
-          ctx.fillStyle = simMode === 'baseline' ? '#EF4444' : '#10B981';
-          ctx.beginPath();
-          ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
-          ctx.fill();
-          if (sp.y >= 370 || sp.y < 290) slagPrills.splice(idx, 1);
-        });
-      }
-
-      function renderLabels() {
-        const labels = [
-          { text: 'Feed Hopper', x: 395, y: 32 },
-          { text: 'Water-Cooled Shell', x: 250, y: 120 },
-          { text: 'Refractory Lining', x: 250, y: 170 },
-          { text: 'Slag Layer (3.5 g/cm³)', x: 420, y: 330 },
-          { text: 'Bullion Pool (9.0 g/cm³)', x: 420, y: 405 },
-          { text: 'Slag Launder Trough', x: 740, y: 325 },
-          { text: 'Slag Ladle Pot', x: 875, y: 490 }
-        ];
-
-        ctx.font = '600 10px Inter, sans-serif';
-        labels.forEach(lbl => {
-          const tw = ctx.measureText(lbl.text).width + 14;
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-          ctx.strokeStyle = '#CBD5E1';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.roundRect(lbl.x - tw / 2, lbl.y - 13, tw, 20, 4);
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = '#0F172A';
-          ctx.textAlign = 'center';
-          ctx.fillText(lbl.text, lbl.x, lbl.y);
-        });
-        ctx.textAlign = 'start';
-      }
-
-      function animate() {
-        time += 0.02;
-        ctx.clearRect(0, 0, W, H);
-
-        drawFurnaceArchitecture();
-        drawFeedSystem();
-        drawConvectionEddies();
-        drawSubmergedTuyeres();
-        drawSlagTappingStream();
-        updateParticles();
-        drawDigitalTwinHUD();
-        renderLabels();
-
-        requestAnimationFrame(animate);
-      }
-
+      // Helper: Rounded Rectangle Polyfill
       if (!ctx.roundRect) {
         ctx.roundRect = function(x, y, w, h, radii) {
           const r = Array.isArray(radii) ? radii : [radii, radii, radii, radii];
@@ -1397,6 +1107,1116 @@
         };
       }
 
+      // ============================================================
+      // RENDERING PIPELINE
+      // ============================================================
+
+      function drawTechnicalBackground() {
+        // High-Tech Industrial Slate Background
+        ctx.fillStyle = '#080E1A';
+        ctx.fillRect(0, 0, W, H);
+
+        // Blueprint Grid Pattern
+        ctx.strokeStyle = 'rgba(30, 41, 59, 0.45)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = 40; x < W; x += 40) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+        }
+        for (let y = 40; y < H; y += 40) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+        }
+        ctx.stroke();
+
+        // Technical Grid Crosshairs
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+        for (let x = 120; x < W; x += 240) {
+          for (let y = 80; y < H; y += 160) {
+            ctx.fillRect(x - 4, y, 9, 1);
+            ctx.fillRect(x, y - 4, 1, 9);
+          }
+        }
+
+        // Ambient Core Furnace Glow
+        const coreGlow = ctx.createRadialGradient(500, 340, 40, 500, 340, 320);
+        const glowAlpha = 0.15 + (1 - transitionProgress) * 0.08;
+        coreGlow.addColorStop(0, `rgba(245, 158, 11, ${glowAlpha})`);
+        coreGlow.addColorStop(0.5, `rgba(239, 68, 68, ${glowAlpha * 0.4})`);
+        coreGlow.addColorStop(1, 'rgba(8, 14, 26, 0)');
+        ctx.fillStyle = coreGlow;
+        ctx.fillRect(200, 100, 600, 400);
+
+        // Structural Support Deck & Steel Platform
+        ctx.fillStyle = '#0F172A';
+        ctx.fillRect(60, 465, 1080, 50);
+
+        // Steel Top Plate
+        ctx.fillStyle = '#1E293B';
+        ctx.fillRect(60, 465, 1080, 5);
+
+        // Black & Amber Safety Hazard Stripes
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(60, 470, 1080, 7);
+        ctx.clip();
+        for (let hx = 50; hx < 1160; hx += 24) {
+          ctx.fillStyle = '#EAB308';
+          ctx.beginPath();
+          ctx.moveTo(hx, 470);
+          ctx.lineTo(hx + 12, 470);
+          ctx.lineTo(hx + 4, 477);
+          ctx.lineTo(hx - 8, 477);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Support I-Beam Pedestals
+        const pedestals = [120, 280, 490, 700, 920, 1080];
+        ctx.fillStyle = '#334155';
+        pedestals.forEach(px => {
+          ctx.fillRect(px - 14, 477, 28, 43);
+          ctx.fillStyle = '#1E293B';
+          ctx.fillRect(px - 18, 477, 4, 43);
+          ctx.fillRect(px + 14, 477, 4, 43);
+          ctx.fillStyle = '#334155';
+        });
+      }
+
+      function drawWaterCoolingJackets() {
+        // Left & Right Coolant Channels
+        const channels = [
+          { x: 278, w: 18 },
+          { x: 694, w: 18 }
+        ];
+
+        channels.forEach(ch => {
+          // Channel Backing
+          ctx.fillStyle = '#032138';
+          ctx.roundRect(ch.x, 82, ch.w, 365, 4);
+          ctx.fill();
+          ctx.strokeStyle = '#0284C7';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Segmented Cooler Blocks
+          for (let y = 92; y < 440; y += 28) {
+            ctx.fillStyle = '#082F49';
+            ctx.fillRect(ch.x + 2, y, ch.w - 4, 22);
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+            ctx.strokeRect(ch.x + 2, y, ch.w - 4, 22);
+          }
+        });
+
+        // Flowing Coolant Pulses
+        coolantPulses.forEach(p => {
+          p.y += p.speed;
+          if (p.y > 440) p.y = 85;
+          const cx = p.side === 'left' ? 287 : 703;
+          const pulseGrad = ctx.createLinearGradient(cx, p.y - 12, cx, p.y + 12);
+          pulseGrad.addColorStop(0, 'rgba(56, 189, 248, 0)');
+          pulseGrad.addColorStop(0.5, 'rgba(56, 189, 248, 0.95)');
+          pulseGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+          ctx.fillStyle = pulseGrad;
+          ctx.fillRect(cx - 6, p.y - 10, 12, 20);
+        });
+      }
+
+      function drawFurnaceVessel() {
+        // 1. Heavy Outer Steel Shell
+        ctx.fillStyle = '#111827';
+        ctx.strokeStyle = '#374151';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(296, 75, 398, 385, [16, 16, 6, 6]);
+        ctx.fill();
+        ctx.stroke();
+
+        // Metallic Bolted Rim
+        ctx.fillStyle = '#4B5563';
+        for (let by = 90; by < 450; by += 26) {
+          ctx.beginPath();
+          ctx.arc(302, by, 2.5, 0, Math.PI * 2);
+          ctx.arc(688, by, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // 2. High-Performance Refractory Lining (Insulating + Chrome-Magnesite Bricks)
+        const refrGrad = ctx.createLinearGradient(320, 0, 670, 0);
+        refrGrad.addColorStop(0, '#5C1D07');
+        refrGrad.addColorStop(0.12, '#852A0A');
+        refrGrad.addColorStop(0.5, '#9A3412');
+        refrGrad.addColorStop(0.88, '#852A0A');
+        refrGrad.addColorStop(1, '#5C1D07');
+        ctx.fillStyle = refrGrad;
+        ctx.beginPath();
+        ctx.roundRect(322, 88, 346, 360, [12, 12, 4, 4]);
+        ctx.fill();
+
+        // Refractory Brick Joints & Thermal Gradient
+        ctx.strokeStyle = 'rgba(254, 215, 170, 0.15)';
+        ctx.lineWidth = 1;
+        for (let ry = 104; ry < 440; ry += 18) {
+          ctx.beginPath();
+          ctx.moveTo(322, ry);
+          ctx.lineTo(668, ry);
+          ctx.stroke();
+        }
+
+        // 3. Inner Chamber Cavity (Freeboard Headspace)
+        ctx.fillStyle = '#060B14';
+        ctx.beginPath();
+        ctx.roundRect(344, 100, 302, 335, [8, 8, 2, 2]);
+        ctx.fill();
+
+        // Headspace Gas Radiation Shimmer
+        const gasGlow = ctx.createLinearGradient(344, 100, 344, 275);
+        gasGlow.addColorStop(0, 'rgba(245, 158, 11, 0.04)');
+        gasGlow.addColorStop(1, 'rgba(245, 158, 11, 0.16)');
+        ctx.fillStyle = gasGlow;
+        ctx.fillRect(344, 100, 302, 175);
+      }
+
+      function drawMoltenBath() {
+        const slagTop = 275;
+        const interfaceY = 370;
+        const bathBottom = 435;
+        const bathLeft = 344;
+        const bathWidth = 302;
+
+        // ========================================================
+        // A. MOLTEN BULLION POOL (Bottom Layer, Density ~9.0 g/cm³)
+        // ========================================================
+        const bullionGrad = ctx.createLinearGradient(bathLeft, interfaceY, bathLeft, bathBottom);
+        bullionGrad.addColorStop(0, '#F59E0B');
+        bullionGrad.addColorStop(0.35, '#D97706');
+        bullionGrad.addColorStop(0.75, '#B45309');
+        bullionGrad.addColorStop(1, '#78350F');
+
+        ctx.fillStyle = bullionGrad;
+        ctx.beginPath();
+        ctx.roundRect(bathLeft, interfaceY, bathWidth, bathBottom - interfaceY, [0, 0, 4, 4]);
+        ctx.fill();
+
+        // Molten Bullion Surface Convection Shimmer
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let bx = bathLeft; bx <= bathLeft + bathWidth; bx += 8) {
+          const by = interfaceY + Math.sin(bx * 0.08 + time * 3) * 1.5;
+          if (bx === bathLeft) ctx.moveTo(bx, by);
+          else ctx.lineTo(bx, by);
+        }
+        ctx.stroke();
+
+        // Settling Absorption Expanding Ripple Rings
+        for (let rIdx = settlingRipples.length - 1; rIdx >= 0; rIdx--) {
+          const rip = settlingRipples[rIdx];
+          rip.r += 0.9;
+          rip.alpha -= 0.025;
+          if (rip.alpha <= 0) {
+            settlingRipples.splice(rIdx, 1);
+            continue;
+          }
+          ctx.strokeStyle = `rgba(254, 240, 138, ${rip.alpha})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.ellipse(rip.x, interfaceY + 2, rip.r, rip.r * 0.35, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // ========================================================
+        // B. MOLTEN SLAG LAYER (Upper Layer, Density ~3.5 g/cm³)
+        // ========================================================
+        // Dynamic crossfade: Baseline (smoky turbulent slag) vs Ag-X (clean sapphire-emerald fluxed slag)
+        const slagGrad = ctx.createLinearGradient(bathLeft, slagTop, bathLeft, interfaceY);
+        if (transitionProgress < 0.5) {
+          const factor = transitionProgress * 2;
+          slagGrad.addColorStop(0, '#3F3F46');
+          slagGrad.addColorStop(0.6, '#27272A');
+          slagGrad.addColorStop(1, '#451A03');
+        } else {
+          slagGrad.addColorStop(0, '#0E2A47');
+          slagGrad.addColorStop(0.5, '#164E63');
+          slagGrad.addColorStop(1, '#1E293B');
+        }
+
+        ctx.fillStyle = slagGrad;
+        ctx.fillRect(bathLeft, slagTop, bathWidth, interfaceY - slagTop);
+
+        // Slag Surface Dynamic Wave Meniscus
+        ctx.fillStyle = 'rgba(245, 158, 11, 0.25)';
+        ctx.beginPath();
+        ctx.moveTo(bathLeft, slagTop);
+        const waveAmp = (1 - transitionProgress) * 3.5 + 0.8;
+        for (let wx = bathLeft; wx <= bathLeft + bathWidth; wx += 6) {
+          const wy = slagTop + Math.sin(wx * 0.06 + time * 4) * waveAmp;
+          ctx.lineTo(wx, wy);
+        }
+        ctx.lineTo(bathLeft + bathWidth, slagTop + 6);
+        ctx.lineTo(bathLeft, slagTop + 6);
+        ctx.closePath();
+        ctx.fill();
+
+        // ========================================================
+        // C. SLAG / BULLION PHASE SEPARATION BOUNDARY
+        // ========================================================
+        const boundaryAlpha = 0.6 + transitionProgress * 0.4;
+        ctx.strokeStyle = transitionProgress > 0.5 ? `rgba(52, 211, 153, ${boundaryAlpha})` : `rgba(245, 158, 11, ${boundaryAlpha})`;
+        ctx.lineWidth = transitionProgress > 0.5 ? 2.2 : 1.5;
+        ctx.setLineDash(transitionProgress > 0.5 ? [6, 4] : [3, 5]);
+        ctx.beginPath();
+        ctx.moveTo(bathLeft, interfaceY);
+        ctx.lineTo(bathLeft + bathWidth, interfaceY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      function drawConvectionAndSettlingVectors() {
+        ctx.save();
+        if (transitionProgress < 0.45) {
+          // BASELINE: Violent Circular Convection Vortices
+          const eddyAlpha = (1 - transitionProgress) * 0.28;
+          ctx.strokeStyle = `rgba(239, 68, 68, ${eddyAlpha})`;
+          ctx.lineWidth = 1.5;
+
+          const vortices = [
+            { x: 420, y: 325, r: 32, speed: 2.8 },
+            { x: 550, y: 328, r: 36, speed: -2.4 }
+          ];
+
+          vortices.forEach(v => {
+            const curAngle = time * v.speed;
+            ctx.beginPath();
+            ctx.arc(v.x, v.y, v.r, curAngle, curAngle + Math.PI * 1.4);
+            ctx.stroke();
+
+            // Arrow head
+            const tipX = v.x + Math.cos(curAngle + Math.PI * 1.4) * v.r;
+            const tipY = v.y + Math.sin(curAngle + Math.PI * 1.4) * v.r;
+            ctx.fillStyle = `rgba(239, 68, 68, ${eddyAlpha * 1.5})`;
+            ctx.beginPath();
+            ctx.arc(tipX, tipY, 3, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        } else {
+          // PROJECT Ag-X: Clean Vertical Stokes Settling Streamlines
+          const settleAlpha = transitionProgress * 0.35;
+          ctx.strokeStyle = `rgba(52, 211, 153, ${settleAlpha})`;
+          ctx.lineWidth = 1.3;
+
+          const streamX = [390, 440, 490, 540, 590];
+          streamX.forEach((sx, idx) => {
+            const offset = (time * 25 + idx * 20) % 75;
+            const sy = 285 + offset;
+            ctx.beginPath();
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(sx, sy + 14);
+            ctx.stroke();
+
+            // Downward arrow marker
+            ctx.fillStyle = `rgba(52, 211, 153, ${settleAlpha * 1.6})`;
+            ctx.beginPath();
+            ctx.moveTo(sx - 2.5, sy + 14);
+            ctx.lineTo(sx + 2.5, sy + 14);
+            ctx.lineTo(sx, sy + 18);
+            ctx.closePath();
+            ctx.fill();
+          });
+        }
+        ctx.restore();
+      }
+
+      function drawFeedSystem() {
+        // Slanted Gravity Conveyor Chute
+        ctx.save();
+        ctx.translate(220, 38);
+        ctx.rotate(0.34);
+
+        // Chute Tube Body
+        ctx.fillStyle = '#1E293B';
+        ctx.roundRect(0, 0, 185, 14, 4);
+        ctx.fill();
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Rotating Internal Conveyor Flights
+        ctx.fillStyle = '#94A3B8';
+        for (let fx = 10; fx < 175; fx += 22) {
+          const shift = (fx + time * 28) % 170;
+          ctx.beginPath();
+          ctx.arc(shift, 7, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+
+        // Feed Hopper Funnel (Top Chamber)
+        ctx.fillStyle = '#334155';
+        ctx.strokeStyle = '#64748B';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(375, 30);
+        ctx.lineTo(445, 30);
+        ctx.lineTo(428, 88);
+        ctx.lineTo(392, 88);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Hopper Internal Feed Level
+        ctx.fillStyle = '#92400E';
+        ctx.beginPath();
+        ctx.moveTo(385, 48);
+        ctx.lineTo(435, 48);
+        ctx.lineTo(422, 85);
+        ctx.lineTo(398, 85);
+        ctx.closePath();
+        ctx.fill();
+
+        // Solid Pellet Generation
+        if (Math.random() < 0.4) {
+          feedPellets.push({
+            x: 402 + (Math.random() - 0.5) * 16,
+            y: 88,
+            vy: 2.6 + Math.random() * 2.2,
+            size: 2.2 + Math.random() * 1.8,
+            color: Math.random() < 0.6 ? '#D97706' : '#B45309'
+          });
+        }
+
+        // Draw & Update Feed Pellets
+        for (let pIdx = feedPellets.length - 1; pIdx >= 0; pIdx--) {
+          const fp = feedPellets[pIdx];
+          fp.y += fp.vy;
+          ctx.fillStyle = fp.color;
+          ctx.beginPath();
+          ctx.arc(fp.x, fp.y, fp.size, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Impact Melting Flash on Slag Surface
+          if (fp.y >= 275) {
+            feedPellets.splice(pIdx, 1);
+            if (meltSparks.length < 24) {
+              for (let k = 0; k < 3; k++) {
+                meltSparks.push({
+                  x: fp.x,
+                  y: 275,
+                  vx: (Math.random() - 0.5) * 2.4,
+                  vy: -Math.random() * 2.2,
+                  alpha: 1,
+                  size: 1.5 + Math.random() * 1.5
+                });
+              }
+            }
+          }
+        }
+
+        // Melting Sparks on Impact
+        for (let sIdx = meltSparks.length - 1; sIdx >= 0; sIdx--) {
+          const ms = meltSparks[sIdx];
+          ms.x += ms.vx;
+          ms.y += ms.vy;
+          ms.vy += 0.12;
+          ms.alpha -= 0.05;
+          if (ms.alpha <= 0) {
+            meltSparks.splice(sIdx, 1);
+            continue;
+          }
+          ctx.fillStyle = `rgba(254, 240, 138, ${ms.alpha})`;
+          ctx.beginPath();
+          ctx.arc(ms.x, ms.y, ms.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawOffgasSystem() {
+        // Uptake Hood Flue (Top Center)
+        ctx.fillStyle = '#1E293B';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(470, 15, 120, 65, [8, 8, 0, 0]);
+        ctx.fill();
+        ctx.stroke();
+
+        // Hood Flange
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(460, 12, 140, 8);
+
+        // Volatilized Fumes Simulation
+        if (Math.random() < 0.45) {
+          fumeParticles.push({
+            x: 520 + (Math.random() - 0.5) * 45,
+            y: 80,
+            vx: (Math.random() - 0.5) * 0.9,
+            vy: -(1.6 + Math.random() * 1.6),
+            radius: 8 + Math.random() * 9,
+            alpha: 0.55
+          });
+        }
+
+        for (let fIdx = fumeParticles.length - 1; fIdx >= 0; fIdx--) {
+          const fp = fumeParticles[fIdx];
+          fp.x += fp.vx;
+          fp.y += fp.vy;
+          fp.radius += 0.22;
+          fp.alpha -= 0.009;
+          if (fp.alpha <= 0 || fp.y < -10) {
+            fumeParticles.splice(fIdx, 1);
+            continue;
+          }
+          const fumeGrad = ctx.createRadialGradient(fp.x, fp.y, 0, fp.x, fp.y, fp.radius);
+          fumeGrad.addColorStop(0, `rgba(148, 163, 184, ${fp.alpha})`);
+          fumeGrad.addColorStop(0.7, `rgba(100, 116, 139, ${fp.alpha * 0.5})`);
+          fumeGrad.addColorStop(1, 'rgba(100, 116, 139, 0)');
+          ctx.fillStyle = fumeGrad;
+          ctx.beginPath();
+          ctx.arc(fp.x, fp.y, fp.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawSubmergedTuyeres() {
+        const tuyereY = [312, 344, 382];
+
+        // 1. High-Pressure Air/O2 Manifold Box
+        ctx.fillStyle = '#0284C7';
+        ctx.strokeStyle = '#38BDF8';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(140, 290, 68, 120, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        // Pressure Dial on Manifold
+        ctx.fillStyle = '#082F49';
+        ctx.beginPath();
+        ctx.arc(174, 318, 14, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#38BDF8';
+        ctx.stroke();
+
+        // Dial Needle
+        const needleAngle = -Math.PI * 0.75 + (1 - transitionProgress * 0.35) * Math.PI * 0.9;
+        ctx.strokeStyle = '#F87171';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(174, 318);
+        ctx.lineTo(174 + Math.cos(needleAngle) * 10, 318 + Math.sin(needleAngle) * 10);
+        ctx.stroke();
+
+        // Text Badge on Manifold
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 8.5px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('BLAST MANIFOLD', 174, 348);
+        ctx.font = '600 7.5px Inter, sans-serif';
+        ctx.fillStyle = '#BAE6FD';
+        ctx.fillText(transitionProgress < 0.5 ? '8,500 Nm³/h' : '5,800 Nm³/h', 174, 362);
+        ctx.fillText('O₂ / COAL', 174, 374);
+        ctx.textAlign = 'start';
+
+        // 2. Individual Tuyere Pipes & Flame Plumes
+        tuyereY.forEach((ty, idx) => {
+          // Steel Feed Pipe
+          ctx.fillStyle = '#334155';
+          ctx.fillRect(208, ty - 6, 116, 12);
+          ctx.fillStyle = '#0284C7';
+          ctx.fillRect(208, ty - 2, 110, 4);
+
+          // Glowing Superheated Copper Nozzle
+          ctx.fillStyle = '#EA580C';
+          ctx.beginPath();
+          ctx.arc(324, ty, 6.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#FBBF24';
+          ctx.beginPath();
+          ctx.arc(324, ty, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Dynamic Submerged Flame Jet
+          const jetLength = (1 - transitionProgress) * 55 + 28 + Math.sin(time * 8 + idx) * 6;
+          const jetHeight = (1 - transitionProgress) * 10 + 6 + Math.sin(time * 6 + idx) * 2;
+
+          // Outer Turbulent Envelope
+          const flameGrad = ctx.createLinearGradient(324, ty, 324 + jetLength, ty);
+          flameGrad.addColorStop(0, '#FFFFFF');
+          flameGrad.addColorStop(0.2, '#FBBF24');
+          flameGrad.addColorStop(0.65, '#EA580C');
+          flameGrad.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+          ctx.fillStyle = flameGrad;
+          ctx.beginPath();
+          ctx.ellipse(324 + jetLength / 2, ty, jetLength / 2, jetHeight, 0, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Submerged Combustion Bubble Ejection
+          if (Math.random() < 0.35) {
+            tuyereBubbles.push({
+              x: 324 + jetLength * 0.85,
+              y: ty + (Math.random() - 0.5) * 6,
+              vx: 0.8 + Math.random() * 1.2,
+              vy: -(0.8 + Math.random() * 1.4),
+              radius: 2 + Math.random() * 3,
+              alpha: 0.85
+            });
+          }
+        });
+
+        // Update Submerged Gas Bubbles
+        for (let bIdx = tuyereBubbles.length - 1; bIdx >= 0; bIdx--) {
+          const tb = tuyereBubbles[bIdx];
+          tb.x += tb.vx;
+          tb.y += tb.vy;
+          tb.alpha -= 0.016;
+          if (tb.alpha <= 0 || tb.y < 275 || tb.x > 640) {
+            tuyereBubbles.splice(bIdx, 1);
+            continue;
+          }
+          ctx.fillStyle = `rgba(254, 215, 170, ${tb.alpha})`;
+          ctx.beginPath();
+          ctx.arc(tb.x, tb.y, tb.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function drawSlagTappingStream() {
+        const tapX = 644;
+        const tapY = 340;
+        const launderEndX = 855;
+        const launderEndY = 385;
+
+        // 1. Tapping Notch Hole
+        ctx.fillStyle = '#060B14';
+        ctx.beginPath();
+        ctx.ellipse(tapX, tapY, 12, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Refractory Slag Launder Runner Trough
+        ctx.fillStyle = '#1E293B';
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(tapX, tapY - 6);
+        ctx.lineTo(launderEndX, launderEndY - 6);
+        ctx.lineTo(launderEndX, launderEndY + 18);
+        ctx.lineTo(tapX, tapY + 18);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // 3. Flowing Molten Slag in Launder
+        const launderFlowGrad = ctx.createLinearGradient(tapX, tapY, launderEndX, launderEndY);
+        launderFlowGrad.addColorStop(0, '#F59E0B');
+        launderFlowGrad.addColorStop(0.5, '#D97706');
+        launderFlowGrad.addColorStop(1, '#B45309');
+
+        ctx.fillStyle = launderFlowGrad;
+        ctx.beginPath();
+        ctx.moveTo(tapX, tapY);
+        ctx.lineTo(launderEndX, launderEndY);
+        ctx.lineTo(launderEndX, launderEndY + 7);
+        ctx.lineTo(tapX, tapY + 7);
+        ctx.closePath();
+        ctx.fill();
+
+        // 4. Parabolic Molten Pouring Stream into Slag Pot Ladle
+        ctx.fillStyle = '#F59E0B';
+        ctx.beginPath();
+        ctx.moveTo(launderEndX - 3, launderEndY);
+        ctx.quadraticCurveTo(launderEndX + 15, launderEndY + 20, 882, 420);
+        ctx.lineTo(888, 420);
+        ctx.quadraticCurveTo(launderEndX + 22, launderEndY + 18, launderEndX + 4, launderEndY + 7);
+        ctx.closePath();
+        ctx.fill();
+
+        // 5. Slag Ladle Pot (Stationed on Floor)
+        ctx.fillStyle = '#0F172A';
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(845, 405);
+        ctx.lineTo(925, 405);
+        ctx.lineTo(910, 465);
+        ctx.lineTo(860, 465);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Trunnion Lifting Ring on Ladle
+        ctx.strokeStyle = '#64748B';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(885, 435, 8, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Molten Slag Pool in Ladle
+        const ladleSlagGrad = ctx.createLinearGradient(855, 415, 855, 460);
+        ladleSlagGrad.addColorStop(0, '#F59E0B');
+        ladleSlagGrad.addColorStop(0.5, '#D97706');
+        ladleSlagGrad.addColorStop(1, '#9A3412');
+        ctx.fillStyle = ladleSlagGrad;
+        ctx.beginPath();
+        ctx.moveTo(852, 418);
+        ctx.lineTo(918, 418);
+        ctx.lineTo(908, 460);
+        ctx.lineTo(862, 460);
+        ctx.closePath();
+        ctx.fill();
+
+        // Un-settled Bullion Sparks entering Ladle in Baseline (Visual proof of loss)
+        if (transitionProgress < 0.4 && Math.random() < 0.6) {
+          launderSparks.push({
+            x: launderEndX + (Math.random() - 0.5) * 12,
+            y: launderEndY + Math.random() * 30,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: 1.5 + Math.random() * 2,
+            alpha: 1
+          });
+        }
+
+        for (let lsIdx = launderSparks.length - 1; lsIdx >= 0; lsIdx--) {
+          const ls = launderSparks[lsIdx];
+          ls.x += ls.vx;
+          ls.y += ls.vy;
+          ls.alpha -= 0.04;
+          if (ls.alpha <= 0 || ls.y > 440) {
+            launderSparks.splice(lsIdx, 1);
+            continue;
+          }
+          ctx.fillStyle = `rgba(239, 68, 68, ${ls.alpha})`;
+          ctx.beginPath();
+          ctx.arc(ls.x, ls.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Ladle Live Tapped Slag Grade Badge
+        ctx.fillStyle = transitionProgress < 0.5 ? 'rgba(220, 38, 38, 0.9)' : 'rgba(5, 150, 105, 0.9)';
+        ctx.roundRect(838, 475, 96, 20, 4);
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 8.5px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(transitionProgress < 0.5 ? 'SLAG: 192 ppm Ag ⚠️' : 'SLAG: ≤25 ppm Ag ✅', 886, 488);
+        ctx.textAlign = 'start';
+      }
+
+      function updateAndDrawPrills() {
+        const slagTop = 278;
+        const interfaceY = 370;
+        const bathLeft = 348;
+        const bathRight = 642;
+
+        slagPrills.forEach(p => {
+          p.shine += 0.06;
+
+          if (transitionProgress < 0.45) {
+            // BASELINE: Violent turbulent convection swirls (Mechanical Entrainment)
+            const eddyForce = (1 - transitionProgress);
+            const centerX = p.x < 495 ? 420 : 550;
+            const centerY = 325;
+            const dx = p.x - centerX;
+            const dy = p.y - centerY;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+            // Tangential vortex velocity
+            p.vx += (-dy / dist) * 0.12 * eddyForce + (Math.random() - 0.5) * 0.2;
+            p.vy += (dx / dist) * 0.12 * eddyForce + (Math.random() - 0.5) * 0.2;
+
+            // Drag resistance
+            p.vx *= 0.94;
+            p.vy *= 0.94;
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Boundary containment & Tapping Weir Entrainment
+            if (p.x > 635 && p.y > 330 && p.y < 355) {
+              // Sucked into tapping launder!
+              p.x = bathLeft + Math.random() * 20;
+              p.y = slagTop + Math.random() * 25;
+            }
+            if (p.x < bathLeft) p.x = bathLeft + 2;
+            if (p.x > bathRight) p.x = bathRight - 2;
+            if (p.y < slagTop) p.y = slagTop + 2;
+            if (p.y > interfaceY - 2) p.y = interfaceY - 4;
+
+            // Draw as Entrained Prill (Reddish-Silver with turbulent aura)
+            ctx.fillStyle = '#EF4444';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(p.x - 0.5, p.y - 0.5, p.radius * 0.45, 0, Math.PI * 2);
+            ctx.fill();
+          } else {
+            // PROJECT Ag-X: Stokes Laminar Settling (Precipitation into Bullion Pool)
+            const settlingSpeed = 0.85 + p.radius * 0.45 * transitionProgress;
+            p.vx *= 0.88;
+            p.vy = settlingSpeed;
+
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (p.x < bathLeft) p.x = bathLeft + 2;
+            if (p.x > bathRight) p.x = bathRight - 2;
+
+            // When reaching Bullion Pool boundary: absorb with golden ripple and re-spawn at top
+            if (p.y >= interfaceY) {
+              if (settlingRipples.length < 20) {
+                settlingRipples.push({
+                  x: p.x,
+                  y: interfaceY,
+                  r: 2,
+                  alpha: 1
+                });
+              }
+              p.y = slagTop + Math.random() * 15;
+              p.x = bathLeft + Math.random() * (bathRight - bathLeft);
+            }
+
+            // Draw as Pure Glistening Silver-Bullion Droplet
+            const shineBrightness = (Math.sin(p.shine) + 1) * 0.5;
+            ctx.fillStyle = '#E2E8F0';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Radiant Silver-Gold Core
+            ctx.fillStyle = shineBrightness > 0.6 ? '#FFFFFF' : '#FDE68A';
+            ctx.beginPath();
+            ctx.arc(p.x - 0.6, p.y - 0.6, p.radius * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+      }
+
+      function drawDigitalTwinHUD() {
+        const hudX = 875;
+        const hudY = 50;
+        const hudW = 300;
+        const hudH = 210;
+
+        // Glassmorphism Container Card
+        ctx.fillStyle = 'rgba(11, 17, 32, 0.94)';
+        ctx.strokeStyle = transitionProgress > 0.5 ? 'rgba(52, 211, 153, 0.5)' : 'rgba(56, 189, 248, 0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(hudX, hudY, hudW, hudH, 12);
+        ctx.fill();
+        ctx.stroke();
+
+        // Card Header Bar
+        ctx.fillStyle = 'rgba(30, 41, 59, 0.6)';
+        ctx.beginPath();
+        ctx.roundRect(hudX, hudY, hudW, 36, [12, 12, 0, 0]);
+        ctx.fill();
+
+        // Radar Beacon LED
+        const beaconColor = transitionProgress > 0.5 ? '#10B981' : '#EF4444';
+        ctx.fillStyle = beaconColor;
+        ctx.beginPath();
+        ctx.arc(894, hudY + 18, 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Beacon Pulse Halo
+        const beaconPulseR = 5 + (Math.sin(time * 6) + 1) * 3.5;
+        ctx.strokeStyle = beaconColor;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(894, hudY + 18, beaconPulseR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // HUD Title
+        ctx.font = '800 11px Inter, sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillText('DIGITAL TWIN REAL-TIME TELEMETRY', 908, hudY + 22);
+
+        // Subtext / Architecture
+        ctx.font = '600 9px Inter, sans-serif';
+        ctx.fillStyle = '#94A3B8';
+        ctx.fillText('FactSage Thermo + LightGBM Residual Sync', 892, hudY + 54);
+
+        // Ag ppm Real-Time Big Metric
+        ctx.font = '800 18px Outfit, sans-serif';
+        ctx.fillStyle = transitionProgress > 0.5 ? '#34D399' : '#F87171';
+        ctx.fillText(`${currentAg.toFixed(1)} ppm Ag`, 892, hudY + 78);
+
+        ctx.font = '700 9.5px Inter, sans-serif';
+        ctx.fillStyle = transitionProgress > 0.5 ? '#A7F3D0' : '#FECACA';
+        ctx.fillText(transitionProgress > 0.5 ? 'TARGET COMPLIANT (≥90% BATCHES)' : 'UNSTABLE DRIFT (78% ENTRAINED)', 992, hudY + 77);
+
+        // ========================================================
+        // 60 FPS REAL-TIME OSCILLOSCOPE SPARKLINE GRAPH
+        // ========================================================
+        const graphX = 892;
+        const graphY = hudY + 92;
+        const graphW = 265;
+        const graphH = 46;
+
+        // Graph Background Box
+        ctx.fillStyle = '#060A12';
+        ctx.roundRect(graphX, graphY, graphW, graphH, 6);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(51, 65, 85, 0.6)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Target Threshold Line (25 ppm)
+        const targetLineY = graphY + graphH - (25 / 230) * graphH;
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(graphX, targetLineY);
+        ctx.lineTo(graphX + graphW, targetLineY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Real-Time Waveform Path
+        ctx.beginPath();
+        for (let i = 0; i < agHistory.length; i++) {
+          const val = agHistory[i];
+          const px = graphX + (i / (agHistory.length - 1)) * graphW;
+          const py = graphY + graphH - Math.max(5, Math.min(graphH - 5, (val / 230) * graphH));
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+
+        ctx.strokeStyle = transitionProgress > 0.5 ? '#10B981' : '#EF4444';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Waveform Area Fill
+        ctx.lineTo(graphX + graphW, graphY + graphH);
+        ctx.lineTo(graphX, graphY + graphH);
+        ctx.closePath();
+        const areaGrad = ctx.createLinearGradient(0, graphY, 0, graphY + graphH);
+        areaGrad.addColorStop(0, transitionProgress > 0.5 ? 'rgba(16, 185, 129, 0.35)' : 'rgba(239, 68, 68, 0.35)');
+        areaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = areaGrad;
+        ctx.fill();
+
+        // ========================================================
+        // TELEMETRY GAUGE PROGRESS BARS
+        // ========================================================
+        // 1. Settling Compliance Gauge
+        ctx.font = '600 8.5px Inter, sans-serif';
+        ctx.fillStyle = '#CBD5E1';
+        ctx.fillText('Settling Recovery Efficiency', 892, hudY + 155);
+        const recoveryVal = (1 - transitionProgress) * 18 + transitionProgress * 93;
+        ctx.textAlign = 'right';
+        ctx.fillText(`${recoveryVal.toFixed(0)}%`, 1157, hudY + 155);
+        ctx.textAlign = 'start';
+
+        ctx.fillStyle = '#1E293B';
+        ctx.roundRect(892, hudY + 160, 265, 6, 3);
+        ctx.fill();
+        ctx.fillStyle = transitionProgress > 0.5 ? '#10B981' : '#F59E0B';
+        ctx.roundRect(892, hudY + 160, 265 * (recoveryVal / 100), 6, 3);
+        ctx.fill();
+
+        // 2. Viscosity Gauge
+        ctx.fillText('Slag Viscosity (Pa·s)', 892, hudY + 182);
+        ctx.textAlign = 'right';
+        ctx.fillText(`${currentVisc.toFixed(2)} Pa·s`, 1157, hudY + 182);
+        ctx.textAlign = 'start';
+
+        ctx.fillStyle = '#1E293B';
+        ctx.roundRect(892, hudY + 187, 265, 6, 3);
+        ctx.fill();
+        ctx.fillStyle = transitionProgress > 0.5 ? '#38BDF8' : '#EF4444';
+        ctx.roundRect(892, hudY + 187, 265 * Math.min(1, currentVisc / 0.6), 6, 3);
+        ctx.fill();
+      }
+
+      function drawModeBanner() {
+        const bannerY = 24;
+        const bannerW = 600;
+        const bannerX = (W - bannerW) / 2;
+
+        ctx.fillStyle = transitionProgress > 0.5 ? 'rgba(6, 78, 59, 0.9)' : 'rgba(127, 29, 29, 0.9)';
+        ctx.strokeStyle = transitionProgress > 0.5 ? '#10B981' : '#EF4444';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.roundRect(bannerX, bannerY, bannerW, 26, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 9.5px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        if (transitionProgress < 0.5) {
+          ctx.fillText('⚠️ BASELINE: High Viscosity (0.52 Pa·s) & Blast Turbulence Prevents Settling → 192 ppm Ag Lost in Slag', W / 2, bannerY + 17);
+        } else {
+          ctx.fillText('⚡ PROJECT Ag-X: Optimal Basicity (CaO/SiO₂=1.15) & AI Settling Protocol → Bullion Precipitates (≤25 ppm Ag)', W / 2, bannerY + 17);
+        }
+        ctx.textAlign = 'start';
+      }
+
+      function drawCalloutLabels() {
+        const callouts = [
+          { text: '1. Feed Hopper & Calcine Dosing', pinX: 410, pinY: 55, lblX: 300, lblY: 35 },
+          { text: '2. Submerged Tuyere Blast', pinX: 324, pinY: 344, lblX: 175, lblY: 428 },
+          { text: '3. Slag Layer (3.5 g/cm³)', pinX: 520, pinY: 310, lblX: 530, lblY: 260 },
+          { text: '4. Bullion Pool (9.0 g/cm³)', pinX: 520, pinY: 400, lblX: 530, lblY: 445 },
+          { text: '5. Slag Launder Trough', pinX: 750, pinY: 360, lblX: 770, lblY: 315 },
+          { text: '6. Slag Ladle Pot', pinX: 885, pinY: 435, lblX: 965, lblY: 450 }
+        ];
+
+        ctx.font = '600 9px Inter, sans-serif';
+        callouts.forEach(c => {
+          // Check hover proximity
+          const isHovered = Math.hypot(mouseX - c.pinX, mouseY - c.pinY) < 35 ||
+                            (mouseX >= c.lblX - 10 && mouseX <= c.lblX + 160 && mouseY >= c.lblY - 14 && mouseY <= c.lblY + 10);
+
+          if (isHovered) activeHoverComponent = c.text;
+
+          // Glowing Pointer Pin
+          ctx.fillStyle = isHovered ? '#38BDF8' : '#F59E0B';
+          ctx.beginPath();
+          ctx.arc(c.pinX, c.pinY, isHovered ? 4.5 : 3, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Hairline Leader Line
+          ctx.strokeStyle = isHovered ? 'rgba(56, 189, 248, 0.9)' : 'rgba(148, 163, 184, 0.45)';
+          ctx.lineWidth = isHovered ? 1.5 : 1;
+          ctx.beginPath();
+          ctx.moveTo(c.pinX, c.pinY);
+          ctx.lineTo(c.lblX, c.lblY);
+          ctx.stroke();
+
+          // Compact Frosted Label Pill
+          const tw = ctx.measureText(c.text).width + 16;
+          ctx.fillStyle = isHovered ? 'rgba(15, 23, 42, 0.96)' : 'rgba(15, 23, 42, 0.82)';
+          ctx.strokeStyle = isHovered ? '#38BDF8' : 'rgba(100, 116, 139, 0.5)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(c.lblX - tw / 2, c.lblY - 10, tw, 18, 4);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = isHovered ? '#38BDF8' : '#F1F5F9';
+          ctx.textAlign = 'center';
+          ctx.fillText(c.text, c.lblX, c.lblY + 3);
+          ctx.textAlign = 'start';
+        });
+      }
+
+      function drawInteractiveHoverTooltip() {
+        if (!activeHoverComponent || mouseX < 0 || mouseY < 0) return;
+
+        let title = activeHoverComponent;
+        let line1 = '';
+        let line2 = '';
+
+        if (title.includes('Feed')) {
+          line1 = 'Continuous fluxing dosing with basicity tracking.';
+          line2 = 'CaO/SiO₂ ratio locked at target 1.15 to lower viscosity.';
+        } else if (title.includes('Tuyere')) {
+          line1 = transitionProgress > 0.5 ? 'Modulated blast: 5,800 Nm³/h quiescent flow.' : 'Baseline blast: 8,500 Nm³/h turbulent stirring.';
+          line2 = 'Prevents bullion re-entrainment into slag phase.';
+        } else if (title.includes('Slag Layer')) {
+          line1 = `Viscosity: ${currentVisc.toFixed(2)} Pa·s | Density: 3.5 g/cm³`;
+          line2 = transitionProgress > 0.5 ? 'Optimal Stokes settling regime active.' : 'High drag keeping 78% of bullion trapped.';
+        } else if (title.includes('Bullion Pool')) {
+          line1 = `Density: 9.0 g/cm³ | Recovery Target: ≥90%`;
+          line2 = 'Precious metal phase collectors ready for tapping.';
+        } else if (title.includes('Launder')) {
+          line1 = 'Refractory decanting runner trough.';
+          line2 = transitionProgress > 0.5 ? 'Tapping 99% pure clean slag without Ag.' : 'Entrained silver escaping to waste dump.';
+        } else if (title.includes('Ladle')) {
+          line1 = `Current Tapped Slag Ag: ${currentAg.toFixed(1)} ppm`;
+          line2 = transitionProgress > 0.5 ? 'Compliant discard-grade clean slag.' : 'High silver loss reporting to discard pot.';
+        }
+
+        // Draw Tooltip Box near Mouse
+        const tx = Math.min(W - 250, Math.max(10, mouseX + 15));
+        const ty = Math.min(H - 85, Math.max(10, mouseY + 15));
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.96)';
+        ctx.strokeStyle = '#38BDF8';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(tx, ty, 240, 68, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = '700 10px Inter, sans-serif';
+        ctx.fillStyle = '#38BDF8';
+        ctx.fillText(title, tx + 12, ty + 18);
+
+        ctx.font = '500 8.5px Inter, sans-serif';
+        ctx.fillStyle = '#CBD5E1';
+        ctx.fillText(line1, tx + 12, ty + 36);
+        ctx.fillText(line2, tx + 12, ty + 52);
+      }
+
+      function updateSimulationPhysics() {
+        // Smooth LERP Transition
+        transitionProgress += (targetProgress - transitionProgress) * 0.04;
+
+        // Telemetry Lerp
+        const targetAg = (1 - targetProgress) * 192.4 + targetProgress * 22.8;
+        const targetVisc = (1 - targetProgress) * 0.52 + targetProgress * 0.28;
+        const targetSettling = (1 - targetProgress) * 10 + targetProgress * 45;
+        const targetTemp = (1 - targetProgress) * 1280 + targetProgress * 1240;
+
+        currentAg += (targetAg - currentAg) * 0.04;
+        currentVisc += (targetVisc - currentVisc) * 0.04;
+        currentSettling += (targetSettling - currentSettling) * 0.04;
+        currentTemp += (targetTemp - currentTemp) * 0.04;
+
+        // Update DOM Telemetry Elements smoothly
+        if (telemetryTemp) telemetryTemp.textContent = `${Math.round(currentTemp)} °C`;
+        if (telemetryVisc) telemetryVisc.textContent = `${currentVisc.toFixed(2)} Pa·s`;
+        if (telemetrySettling) telemetrySettling.textContent = `${Math.round(currentSettling)} min`;
+        if (telemetryAg) {
+          telemetryAg.textContent = `${currentAg.toFixed(1)} ppm`;
+          telemetryAg.className = transitionProgress > 0.5 ? 'telemetry-val alert-green' : 'telemetry-val alert-red';
+        }
+
+        // Push real-time micro-fluctuations into Rolling Sparkline History
+        if (Math.random() < 0.8) {
+          agHistory.shift();
+          const jitter = transitionProgress < 0.5
+            ? (Math.sin(time * 4) * 4.5 + (Math.random() - 0.5) * 6)
+            : (Math.sin(time * 2) * 0.3 + (Math.random() - 0.5) * 0.4);
+          agHistory.push(Math.max(15, currentAg + jitter));
+        }
+      }
+
+      function animate() {
+        time += 0.025;
+        activeHoverComponent = null;
+
+        updateSimulationPhysics();
+
+        ctx.clearRect(0, 0, W, H);
+
+        drawTechnicalBackground();
+        drawWaterCoolingJackets();
+        drawFurnaceVessel();
+        drawMoltenBath();
+        drawConvectionAndSettlingVectors();
+        updateAndDrawPrills();
+        drawSubmergedTuyeres();
+        drawFeedSystem();
+        drawOffgasSystem();
+        drawSlagTappingStream();
+        drawModeBanner();
+        drawDigitalTwinHUD();
+        drawCalloutLabels();
+        drawInteractiveHoverTooltip();
+
+        requestAnimationFrame(animate);
+      }
+
+      window.addEventListener('resize', initCanvasSize);
       animate();
     })();
   </script>

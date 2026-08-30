@@ -1,8 +1,7 @@
 # Project Ag-X: Silver Loss Reduction in Fumer Plant Slag
 
 > **A Dual-Track Metallurgical & Hybrid Physics+AI Digital Twin Programme**  
-> *Target: Eliminate silver loss from 192 ppm to &le;25 ppm across &ge;90% of production batches.*  
-> **-By Pratham**
+> *Target: Eliminate silver loss from 192 ppm to &le;25 ppm across &ge;90% of production batches.*
 
 ---
 
@@ -79,9 +78,3 @@ Ag-X/
 └── README.md                # Project documentation
 ```
 
----
-
-## 👤 Author
-
-- **-By Pratham**  
-*Project Ag-X · Fumer Pyrometallurgy & Digital Twin Engineering*

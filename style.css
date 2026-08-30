@@ -283,58 +283,6 @@ button {
   color: var(--copper-700);
 }
 
-/* Animated Shifting Color Font for -By Pratham above starting image */
-@keyframes textGradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-.hero-author-header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 0.65rem;
-}
-
-.by-pratham-hero {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.3rem 0.85rem;
-  background: #FFFFFF;
-  border: 1.5px solid transparent;
-  border-radius: 9999px;
-  background-image: linear-gradient(#FFFFFF, #FFFFFF), linear-gradient(90deg, #D97706, #EF4444, #8B5CF6, #06B6D4, #10B981, #D97706);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  background-size: 100% 100%, 300% 300%;
-  animation: textGradientShift 4s ease infinite;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.by-pratham-hero:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
-}
-
-.by-pratham-text {
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  background: linear-gradient(90deg, #D97706, #DC2626, #7C3AED, #2563EB, #059669, #D97706);
-  background-size: 300% 300%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: textGradientShift 4s ease infinite;
-}
 
 .mobile-menu-btn {
   display: none;

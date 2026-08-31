@@ -786,7 +786,7 @@
     /* ============================================================
        1. Scroll Reveal Observer
        ============================================================ */
-    const revealEls = document.querySelectorAll('.reveal');
+    const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -795,6 +795,55 @@
       });
     }, { threshold: 0.08 });
     revealEls.forEach(el => revealObserver.observe(el));
+
+    /* ============================================================
+       1b. Animated Metric Counter (Hero Values Count Up)
+       ============================================================ */
+    function animateCounter(element, target, suffix, prefix, duration) {
+      prefix = prefix || '';
+      suffix = suffix || '';
+      duration = duration || 1800;
+      let start = 0;
+      const startTime = performance.now();
+      const isDecimal = target % 1 !== 0;
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease-out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = start + (target - start) * eased;
+        if (isDecimal) {
+          element.innerHTML = prefix + current.toFixed(2) + suffix;
+        } else {
+          element.innerHTML = prefix + Math.round(current) + suffix;
+        }
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    }
+
+    // Observe hero metrics and trigger count-up animation
+    const metricVals = document.querySelectorAll('.metric-val');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.counted) {
+          entry.target.dataset.counted = 'true';
+          const el = entry.target;
+          const text = el.textContent.trim();
+          if (text.includes('192')) {
+            animateCounter(el, 192, ' <span style="font-size: 0.75rem; font-weight: 600;">ppm</span>', '', 1600);
+            el.classList.add('val-red');
+          } else if (text.includes('25')) {
+            animateCounter(el, 25, ' <span style="font-size: 0.75rem; font-weight: 600;">ppm</span>', '≤ ', 1600);
+            el.classList.add('val-green');
+          } else if (text.includes('141.95')) {
+            animateCounter(el, 141.95, ' Cr', '+₹', 2200);
+            el.classList.add('val-gold');
+          }
+        }
+      });
+    }, { threshold: 0.5 });
+    metricVals.forEach(el => counterObserver.observe(el));
 
     /* ============================================================
        2. Sticky Navbar Styling & Scroll Meter Update
@@ -824,6 +873,14 @@
       if (meterRingFill) {
         const offset = circumference - (scrollFraction * circumference);
         meterRingFill.style.strokeDashoffset = offset;
+        // Dynamic glow color: copper → emerald as scroll progresses
+        if (scrollFraction < 0.5) {
+          meterRingFill.style.stroke = '#F59E0B';
+          meterRingFill.style.filter = `drop-shadow(0 0 ${3 + scrollFraction * 8}px rgba(245, 158, 11, ${0.4 + scrollFraction * 0.4}))`;
+        } else {
+          meterRingFill.style.stroke = '#10B981';
+          meterRingFill.style.filter = `drop-shadow(0 0 ${3 + scrollFraction * 8}px rgba(16, 185, 129, ${0.4 + scrollFraction * 0.4}))`;
+        }
       }
 
       if (meterPercentage) {
@@ -1086,6 +1143,19 @@
       // 7. Launder Pouring Slag Stream & Loss Sparks
       const launderSparks = [];
 
+      // 8. Heat Embers Rising from Slag Surface
+      const heatEmbers = [];
+
+      // 9. Tuyere Nozzle Sparks
+      const nozzleSparks = [];
+
+      // 10. Prill Settling Trails (Optimized Mode)
+      const prillTrails = [];
+
+      // 11. Mode transition flash
+      let modeFlashAlpha = 0;
+      let prevMode = 'baseline';
+
       // Helper: Rounded Rectangle Polyfill
       if (!ctx.roundRect) {
         ctx.roundRect = function(x, y, w, h, radii) {
@@ -1291,12 +1361,44 @@
         ctx.roundRect(296, 136, 388, 384, [10, 10, 4, 4]);
         ctx.fill();
 
+        // Glowing Refractory Heat Pulses (animated thermal radiation on inner walls)
+        const heatIntensity = 0.12 + Math.sin(time * 1.5) * 0.06;
+        const leftGlow = ctx.createLinearGradient(296, 136, 340, 136);
+        leftGlow.addColorStop(0, `rgba(234, 88, 12, ${heatIntensity})`);
+        leftGlow.addColorStop(1, 'rgba(234, 88, 12, 0)');
+        ctx.fillStyle = leftGlow;
+        ctx.fillRect(296, 310, 44, 210);
+
+        const rightGlow = ctx.createLinearGradient(684, 136, 640, 136);
+        rightGlow.addColorStop(0, `rgba(234, 88, 12, ${heatIntensity})`);
+        rightGlow.addColorStop(1, 'rgba(234, 88, 12, 0)');
+        ctx.fillStyle = rightGlow;
+        ctx.fillRect(640, 310, 44, 210);
+
         // Ambient Gas Headspace Warmth
         const gasGlow = ctx.createLinearGradient(296, 136, 296, 310);
         gasGlow.addColorStop(0, 'rgba(245, 158, 11, 0.05)');
         gasGlow.addColorStop(1, 'rgba(245, 158, 11, 0.18)');
         ctx.fillStyle = gasGlow;
         ctx.fillRect(296, 136, 388, 174);
+
+        // Heat Haze Shimmer Effect (sinusoidal distortion lines in freeboard)
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        ctx.strokeStyle = '#FBBF24';
+        ctx.lineWidth = 0.8;
+        for (let hz = 0; hz < 5; hz++) {
+          ctx.beginPath();
+          const hazeY = 160 + hz * 28;
+          for (let hx = 300; hx <= 680; hx += 4) {
+            const hy = hazeY + Math.sin(hx * 0.03 + time * 3 + hz * 1.2) * 3
+                             + Math.sin(hx * 0.07 + time * 5) * 1.5;
+            if (hx === 300) ctx.moveTo(hx, hy);
+            else ctx.lineTo(hx, hy);
+          }
+          ctx.stroke();
+        }
+        ctx.restore();
       }
 
       function drawMoltenBath() {
@@ -1319,6 +1421,15 @@
         ctx.beginPath();
         ctx.roundRect(bathLeft, interfaceY, bathWidth, bathBottom - interfaceY, [0, 0, 6, 6]);
         ctx.fill();
+
+        // Bullion Pool Animated Golden Corona Glow
+        const coronaAlpha = 0.15 + Math.sin(time * 2) * 0.08;
+        const coronaGlow = ctx.createLinearGradient(bathLeft, interfaceY - 8, bathLeft, interfaceY + 12);
+        coronaGlow.addColorStop(0, `rgba(251, 191, 36, ${coronaAlpha})`);
+        coronaGlow.addColorStop(0.5, `rgba(245, 158, 11, ${coronaAlpha * 1.5})`);
+        coronaGlow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        ctx.fillStyle = coronaGlow;
+        ctx.fillRect(bathLeft, interfaceY - 6, bathWidth, 18);
 
         // Molten Bullion Surface Convection Shimmer
         ctx.strokeStyle = 'rgba(254, 240, 138, 0.55)';
@@ -1364,19 +1475,56 @@
         ctx.fillStyle = slagGrad;
         ctx.fillRect(bathLeft, slagTop, bathWidth, interfaceY - slagTop);
 
-        // Slag Surface Dynamic Wave Meniscus
+        // Slag Surface Dynamic Wave Meniscus (Multi-Harmonic Organic Waves)
         ctx.fillStyle = 'rgba(254, 215, 170, 0.3)';
         ctx.beginPath();
         ctx.moveTo(bathLeft, slagTop);
         const waveAmp = (1 - transitionProgress) * 3.8 + 0.9;
-        for (let wx = bathLeft; wx <= bathLeft + bathWidth; wx += 6) {
-          const wy = slagTop + Math.sin(wx * 0.05 + time * 4) * waveAmp;
+        for (let wx = bathLeft; wx <= bathLeft + bathWidth; wx += 4) {
+          const wy = slagTop
+            + Math.sin(wx * 0.05 + time * 4) * waveAmp
+            + Math.sin(wx * 0.12 + time * 6.5) * (waveAmp * 0.3)
+            + Math.sin(wx * 0.025 + time * 2) * (waveAmp * 0.5);
           ctx.lineTo(wx, wy);
         }
         ctx.lineTo(bathLeft + bathWidth, slagTop + 8);
         ctx.lineTo(bathLeft, slagTop + 8);
         ctx.closePath();
         ctx.fill();
+
+        // Heat Embers Rising from Slag Surface
+        if (Math.random() < 0.25) {
+          heatEmbers.push({
+            x: bathLeft + 20 + Math.random() * (bathWidth - 40),
+            y: slagTop,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: -(0.6 + Math.random() * 1.2),
+            radius: 1.0 + Math.random() * 1.8,
+            alpha: 0.7 + Math.random() * 0.3,
+            color: Math.random() < 0.6 ? '#F59E0B' : '#FBBF24'
+          });
+        }
+
+        // Draw and Update Heat Embers
+        for (let eIdx = heatEmbers.length - 1; eIdx >= 0; eIdx--) {
+          const em = heatEmbers[eIdx];
+          em.x += em.vx + Math.sin(time * 3 + eIdx) * 0.15;
+          em.y += em.vy;
+          em.alpha -= 0.008;
+          em.radius -= 0.01;
+          if (em.alpha <= 0 || em.y < 140 || em.radius <= 0) {
+            heatEmbers.splice(eIdx, 1);
+            continue;
+          }
+          const emGrad = ctx.createRadialGradient(em.x, em.y, 0, em.x, em.y, em.radius * 2);
+          emGrad.addColorStop(0, `rgba(254, 240, 138, ${em.alpha})`);
+          emGrad.addColorStop(0.5, `rgba(245, 158, 11, ${em.alpha * 0.5})`);
+          emGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+          ctx.fillStyle = emGrad;
+          ctx.beginPath();
+          ctx.arc(em.x, em.y, em.radius * 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
 
         // ========================================================
         // C. SLAG / BULLION PHASE SEPARATION BOUNDARY
@@ -1507,6 +1655,18 @@
         for (let pIdx = feedPellets.length - 1; pIdx >= 0; pIdx--) {
           const fp = feedPellets[pIdx];
           fp.y += fp.vy;
+
+          // Glowing motion trail behind pellet
+          const trailGrad = ctx.createLinearGradient(fp.x, fp.y - fp.vy * 3, fp.x, fp.y);
+          trailGrad.addColorStop(0, 'rgba(217, 119, 6, 0)');
+          trailGrad.addColorStop(1, 'rgba(217, 119, 6, 0.35)');
+          ctx.strokeStyle = trailGrad;
+          ctx.lineWidth = fp.size * 0.8;
+          ctx.beginPath();
+          ctx.moveTo(fp.x, fp.y - fp.vy * 3);
+          ctx.lineTo(fp.x, fp.y);
+          ctx.stroke();
+
           ctx.fillStyle = fp.color;
           ctx.beginPath();
           ctx.arc(fp.x, fp.y, fp.size, 0, Math.PI * 2);
@@ -1646,7 +1806,17 @@
           ctx.fillStyle = '#0284C7';
           ctx.fillRect(195, ty - 2.5, 78, 5);
 
-          // Glowing Superheated Copper Nozzle
+          // Glowing Superheated Copper Nozzle with animated heat ring
+          const nozzleGlow = ctx.createRadialGradient(280, ty, 0, 280, ty, 14);
+          nozzleGlow.addColorStop(0, '#FBBF24');
+          nozzleGlow.addColorStop(0.35, '#EA580C');
+          nozzleGlow.addColorStop(0.7, `rgba(234, 88, 12, ${0.3 + Math.sin(time * 6 + idx) * 0.15})`);
+          nozzleGlow.addColorStop(1, 'rgba(234, 88, 12, 0)');
+          ctx.fillStyle = nozzleGlow;
+          ctx.beginPath();
+          ctx.arc(280, ty, 14, 0, Math.PI * 2);
+          ctx.fill();
+
           ctx.fillStyle = '#EA580C';
           ctx.beginPath();
           ctx.arc(280, ty, 7.5, 0, Math.PI * 2);
@@ -1655,6 +1825,21 @@
           ctx.beginPath();
           ctx.arc(280, ty, 4, 0, Math.PI * 2);
           ctx.fill();
+
+          // Nozzle Sparks Ejection
+          if (Math.random() < 0.4) {
+            for (let ns = 0; ns < 2; ns++) {
+              nozzleSparks.push({
+                x: 280 + Math.random() * 8,
+                y: ty + (Math.random() - 0.5) * 6,
+                vx: 2.0 + Math.random() * 3.5,
+                vy: (Math.random() - 0.5) * 3.0,
+                alpha: 1,
+                size: 1.0 + Math.random() * 1.5,
+                color: Math.random() < 0.4 ? '#FFFFFF' : '#FDE68A'
+              });
+            }
+          }
 
           // Dynamic Submerged Flame Jet firing from inner wall (X = 296)
           const jetLength = (1 - transitionProgress) * 60 + 32 + Math.sin(time * 8 + idx) * 6;
@@ -1698,6 +1883,33 @@
           ctx.beginPath();
           ctx.arc(tb.x, tb.y, tb.radius, 0, Math.PI * 2);
           ctx.fill();
+        }
+
+        // Update and Draw Nozzle Sparks
+        for (let nsIdx = nozzleSparks.length - 1; nsIdx >= 0; nsIdx--) {
+          const ns = nozzleSparks[nsIdx];
+          ns.x += ns.vx;
+          ns.y += ns.vy;
+          ns.vy += 0.08; // gravity
+          ns.alpha -= 0.03;
+          ns.vx *= 0.98;
+          if (ns.alpha <= 0 || ns.x > 400 || ns.y > 520) {
+            nozzleSparks.splice(nsIdx, 1);
+            continue;
+          }
+          ctx.fillStyle = ns.color === '#FFFFFF'
+            ? `rgba(255, 255, 255, ${ns.alpha})`
+            : `rgba(253, 230, 138, ${ns.alpha})`;
+          ctx.beginPath();
+          ctx.arc(ns.x, ns.y, ns.size, 0, Math.PI * 2);
+          ctx.fill();
+          // Spark trail
+          ctx.strokeStyle = `rgba(245, 158, 11, ${ns.alpha * 0.4})`;
+          ctx.lineWidth = 0.6;
+          ctx.beginPath();
+          ctx.moveTo(ns.x, ns.y);
+          ctx.lineTo(ns.x - ns.vx * 2, ns.y - ns.vy * 2);
+          ctx.stroke();
         }
       }
 
@@ -1865,7 +2077,16 @@
             if (p.y < slagTop) p.y = slagTop + 2;
             if (p.y > interfaceY - 2) p.y = interfaceY - 4;
 
-            // Entrained Prill (Bright Reddish-Silver dot)
+            // Entrained Prill (Bright Reddish-Silver dot with glow ring)
+            const prillGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 3);
+            prillGlow.addColorStop(0, 'rgba(239, 68, 68, 0)');
+            prillGlow.addColorStop(0.5, 'rgba(239, 68, 68, 0)');
+            prillGlow.addColorStop(1, `rgba(239, 68, 68, ${0.12 + Math.sin(p.shine) * 0.06})`);
+            ctx.fillStyle = prillGlow;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
+            ctx.fill();
+
             ctx.fillStyle = '#EF4444';
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -1887,6 +2108,16 @@
             if (p.x < bathLeft) p.x = bathLeft + 2;
             if (p.x > bathRight) p.x = bathRight - 2;
 
+            // Generate Settling Trail Particles
+            if (prillTrails.length < 200 && Math.random() < 0.5) {
+              prillTrails.push({
+                x: p.x + (Math.random() - 0.5) * 2,
+                y: p.y - p.vy * 0.5,
+                alpha: 0.5,
+                size: p.radius * 0.4
+              });
+            }
+
             // Absorbed into Bullion Pool
             if (p.y >= interfaceY) {
               if (settlingRipples.length < 24) {
@@ -1901,8 +2132,18 @@
               p.x = bathLeft + Math.random() * (bathRight - bathLeft);
             }
 
-            // Glistening Pure Silver Droplet
+            // Glistening Pure Silver Droplet with blue glow halo
             const shineBrightness = (Math.sin(p.shine) + 1) * 0.5;
+
+            // Glow halo
+            const dropGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 3.5);
+            dropGlow.addColorStop(0, `rgba(56, 189, 248, ${0.08 + shineBrightness * 0.08})`);
+            dropGlow.addColorStop(1, 'rgba(56, 189, 248, 0)');
+            ctx.fillStyle = dropGlow;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius * 3.5, 0, Math.PI * 2);
+            ctx.fill();
+
             ctx.fillStyle = '#FFFFFF';
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -1917,6 +2158,21 @@
             ctx.fill();
           }
         });
+
+        // Draw and Update Prill Settling Trails
+        for (let tIdx = prillTrails.length - 1; tIdx >= 0; tIdx--) {
+          const tr = prillTrails[tIdx];
+          tr.alpha -= 0.018;
+          tr.size -= 0.008;
+          if (tr.alpha <= 0 || tr.size <= 0) {
+            prillTrails.splice(tIdx, 1);
+            continue;
+          }
+          ctx.fillStyle = `rgba(56, 189, 248, ${tr.alpha * 0.6})`;
+          ctx.beginPath();
+          ctx.arc(tr.x, tr.y, tr.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
       function drawDigitalTwinHUD() {
@@ -1953,7 +2209,14 @@
         ctx.fill();
         ctx.stroke();
 
-        // Glowing Beacon inside Pill
+        // Glowing Beacon inside Pill with pulsing glow ring
+        const beaconGlowRadius = 4.5 + Math.sin(time * 4) * 1.5;
+        const beaconColor = isOpt ? 'rgba(22, 163, 74, 0.3)' : 'rgba(220, 38, 38, 0.3)';
+        ctx.fillStyle = beaconColor;
+        ctx.beginPath();
+        ctx.arc(1046, hudY + 24, beaconGlowRadius + 3, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.fillStyle = isOpt ? '#16A34A' : '#DC2626';
         ctx.beginPath();
         ctx.arc(1046, hudY + 24, 4.5, 0, Math.PI * 2);
@@ -2044,6 +2307,28 @@
         areaGrad.addColorStop(0, isOpt ? 'rgba(16, 185, 129, 0.28)' : 'rgba(239, 68, 68, 0.25)');
         areaGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = areaGrad;
+        ctx.fill();
+
+        // Sparkline Cursor Dot at Leading Edge
+        const lastVal = agHistory[agHistory.length - 1];
+        const cursorX = graphX + graphW;
+        const cursorY = graphY + graphH - Math.max(5, Math.min(graphH - 5, (lastVal / 230) * graphH));
+        // Outer glow
+        const cursorGlow = ctx.createRadialGradient(cursorX, cursorY, 0, cursorX, cursorY, 8);
+        cursorGlow.addColorStop(0, isOpt ? 'rgba(5, 150, 105, 0.6)' : 'rgba(220, 38, 38, 0.6)');
+        cursorGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = cursorGlow;
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, 8, 0, Math.PI * 2);
+        ctx.fill();
+        // Dot core
+        ctx.fillStyle = isOpt ? '#059669' : '#DC2626';
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(cursorX, cursorY, 1.5, 0, Math.PI * 2);
         ctx.fill();
 
         // 3. Dynamic Progress Meters
@@ -2252,6 +2537,15 @@
         time += 0.025;
         activeHoverComponent = null;
 
+        // Detect mode change for flash effect
+        if (simMode !== prevMode) {
+          modeFlashAlpha = 0.45;
+          prevMode = simMode;
+        }
+        if (modeFlashAlpha > 0) {
+          modeFlashAlpha -= 0.015;
+        }
+
         updateSimulationPhysics();
 
         ctx.clearRect(0, 0, W, H);
@@ -2270,6 +2564,22 @@
         drawDigitalTwinHUD();
         drawCalloutLabels();
         drawInteractiveHoverTooltip();
+
+        // Mode Transition Flash Wipe Overlay
+        if (modeFlashAlpha > 0) {
+          const flashColor = simMode === 'optimized'
+            ? `rgba(16, 185, 129, ${modeFlashAlpha})`
+            : `rgba(239, 68, 68, ${modeFlashAlpha})`;
+          ctx.fillStyle = flashColor;
+          ctx.fillRect(0, 0, W, H);
+        }
+
+        // Dynamic Cursor: pointer over HUD, crosshair elsewhere
+        if (mouseX >= 1015 && mouseX <= 1410 && mouseY >= 55 && mouseY <= 555) {
+          canvas.style.cursor = 'pointer';
+        } else {
+          canvas.style.cursor = 'crosshair';
+        }
 
         requestAnimationFrame(animate);
       }
